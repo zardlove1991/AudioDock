@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Slider } from "@miblanchard/react-native-slider";
 import { toggleLike, toggleUnLike } from "@soundx/services";
 import { useRouter } from "expo-router";
+import * as ScreenOrientation from 'expo-screen-orientation';
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -109,6 +110,28 @@ export default function PlayerScreen() {
       setLiked(!!isLiked);
     }
   }, [currentTrack, user]);
+
+  useEffect(() => {
+    // Unlock rotation when entering player screen
+    const unlockOrientation = async () => {
+      try {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.DEFAULT);
+      } catch (error) {
+        console.warn("Failed to unlock orientation:", error);
+      }
+    };
+    
+    unlockOrientation();
+
+    return () => {
+      // Lock back to portrait when leaving
+      try {
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+      } catch (error) {
+        console.warn("Failed to lock orientation to portrait:", error);
+      }
+    };
+  }, []);
   
   const breatheAnim = useRef(new Animated.Value(1)).current;
 
@@ -857,14 +880,14 @@ const styles = StyleSheet.create({
   },
   landscapeLeft: {
     flex: 1,
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 24,
   },
   landscapeRight: {
     flex: 1,
-    padding: 20,
-    justifyContent: "space-between",
+    padding: 24,
+    justifyContent: "center",
   },
   landscapeArtwork: {
     width: 250,

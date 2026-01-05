@@ -59,6 +59,7 @@ export interface Track {
   createdAt: string | Date; // DateTime in Prisma maps to Date object or ISO string in JSON
   artistId?: number;
   albumId?: number;
+  folderId?: number;
   likedByUsers?: UserTrackLike[];
   listenedByUsers?: UserTrackHistory[];
   likedAsAudiobookByUsers?: UserAudiobookLike[];
@@ -178,4 +179,13 @@ export interface Device {
   lastSeen?: string | Date;
   createdAt: Date;
   updatedAt: Date;
+}
+export interface Folder {
+  id: number;
+  path: string;
+  name: string;
+  parentId: number | null;
+  type: TrackType;
+  children?: Folder[];
+  tracks?: Track[];
 }

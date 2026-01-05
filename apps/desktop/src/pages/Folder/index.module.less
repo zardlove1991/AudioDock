@@ -1,0 +1,115 @@
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 154px);
+  padding: 0 30px;
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(100px);
+  -webkit-backdrop-filter: blur(100px);
+  overflow: auto;
+}
+
+.header {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 11;
+  transform: scale(1.2);
+}
+
+.content {
+  flex: 1;
+  padding: 12px;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+
+  &.selected {
+    background-color: rgba(22, 119, 255, 0.2) !important;
+    .iconWrapper {
+      box-shadow: 0 0 10px rgba(22, 119, 255, 0.5);
+    }
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    
+    .iconWrapper {
+        transform: translateY(-2px);
+    }
+
+    .moreButton {
+        opacity: 1;
+    }
+  }
+}
+
+.moreButton {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+}
+
+.iconWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+
+.cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.itemName {
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+}

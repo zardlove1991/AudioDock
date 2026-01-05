@@ -73,6 +73,11 @@ export type Device = $Result.DefaultSelection<Prisma.$DevicePayload>
  * 
  */
 export type Playlist = $Result.DefaultSelection<Prisma.$PlaylistPayload>
+/**
+ * Model Folder
+ * 
+ */
+export type Folder = $Result.DefaultSelection<Prisma.$FolderPayload>
 
 /**
  * Enums
@@ -335,6 +340,16 @@ export class PrismaClient<
     * ```
     */
   get playlist(): Prisma.PlaylistDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.folder`: Exposes CRUD operations for the **Folder** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Folders
+    * const folders = await prisma.folder.findMany()
+    * ```
+    */
+  get folder(): Prisma.FolderDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -786,7 +801,8 @@ export namespace Prisma {
     UserAudiobookHistory: 'UserAudiobookHistory',
     User: 'User',
     Device: 'Device',
-    Playlist: 'Playlist'
+    Playlist: 'Playlist',
+    Folder: 'Folder'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -805,7 +821,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "track" | "album" | "artist" | "userTrackLike" | "userTrackHistory" | "userAlbumLike" | "userAlbumHistory" | "userAudiobookLike" | "userAudiobookHistory" | "user" | "device" | "playlist"
+      modelProps: "track" | "album" | "artist" | "userTrackLike" | "userTrackHistory" | "userAlbumLike" | "userAlbumHistory" | "userAudiobookLike" | "userAudiobookHistory" | "user" | "device" | "playlist" | "folder"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1697,6 +1713,80 @@ export namespace Prisma {
           }
         }
       }
+      Folder: {
+        payload: Prisma.$FolderPayload<ExtArgs>
+        fields: Prisma.FolderFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FolderFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FolderFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload>
+          }
+          findFirst: {
+            args: Prisma.FolderFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FolderFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload>
+          }
+          findMany: {
+            args: Prisma.FolderFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload>[]
+          }
+          create: {
+            args: Prisma.FolderCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload>
+          }
+          createMany: {
+            args: Prisma.FolderCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FolderCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload>[]
+          }
+          delete: {
+            args: Prisma.FolderDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload>
+          }
+          update: {
+            args: Prisma.FolderUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload>
+          }
+          deleteMany: {
+            args: Prisma.FolderDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FolderUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FolderUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload>[]
+          }
+          upsert: {
+            args: Prisma.FolderUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FolderPayload>
+          }
+          aggregate: {
+            args: Prisma.FolderAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFolder>
+          }
+          groupBy: {
+            args: Prisma.FolderGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FolderGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FolderCountArgs<ExtArgs>
+            result: $Utils.Optional<FolderCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1793,6 +1883,7 @@ export namespace Prisma {
     user?: UserOmit
     device?: DeviceOmit
     playlist?: PlaylistOmit
+    folder?: FolderOmit
   }
 
   /* Types for Logging */
@@ -2186,6 +2277,46 @@ export namespace Prisma {
 
 
   /**
+   * Count Type FolderCountOutputType
+   */
+
+  export type FolderCountOutputType = {
+    children: number
+    tracks: number
+  }
+
+  export type FolderCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    children?: boolean | FolderCountOutputTypeCountChildrenArgs
+    tracks?: boolean | FolderCountOutputTypeCountTracksArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * FolderCountOutputType without action
+   */
+  export type FolderCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FolderCountOutputType
+     */
+    select?: FolderCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * FolderCountOutputType without action
+   */
+  export type FolderCountOutputTypeCountChildrenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FolderWhereInput
+  }
+
+  /**
+   * FolderCountOutputType without action
+   */
+  export type FolderCountOutputTypeCountTracksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TrackWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -2208,6 +2339,7 @@ export namespace Prisma {
     episodeNumber: number | null
     artistId: number | null
     albumId: number | null
+    folderId: number | null
   }
 
   export type TrackSumAggregateOutputType = {
@@ -2217,6 +2349,7 @@ export namespace Prisma {
     episodeNumber: number | null
     artistId: number | null
     albumId: number | null
+    folderId: number | null
   }
 
   export type TrackMinAggregateOutputType = {
@@ -2235,6 +2368,7 @@ export namespace Prisma {
     episodeNumber: number | null
     artistId: number | null
     albumId: number | null
+    folderId: number | null
   }
 
   export type TrackMaxAggregateOutputType = {
@@ -2253,6 +2387,7 @@ export namespace Prisma {
     episodeNumber: number | null
     artistId: number | null
     albumId: number | null
+    folderId: number | null
   }
 
   export type TrackCountAggregateOutputType = {
@@ -2271,6 +2406,7 @@ export namespace Prisma {
     episodeNumber: number
     artistId: number
     albumId: number
+    folderId: number
     _all: number
   }
 
@@ -2282,6 +2418,7 @@ export namespace Prisma {
     episodeNumber?: true
     artistId?: true
     albumId?: true
+    folderId?: true
   }
 
   export type TrackSumAggregateInputType = {
@@ -2291,6 +2428,7 @@ export namespace Prisma {
     episodeNumber?: true
     artistId?: true
     albumId?: true
+    folderId?: true
   }
 
   export type TrackMinAggregateInputType = {
@@ -2309,6 +2447,7 @@ export namespace Prisma {
     episodeNumber?: true
     artistId?: true
     albumId?: true
+    folderId?: true
   }
 
   export type TrackMaxAggregateInputType = {
@@ -2327,6 +2466,7 @@ export namespace Prisma {
     episodeNumber?: true
     artistId?: true
     albumId?: true
+    folderId?: true
   }
 
   export type TrackCountAggregateInputType = {
@@ -2345,6 +2485,7 @@ export namespace Prisma {
     episodeNumber?: true
     artistId?: true
     albumId?: true
+    folderId?: true
     _all?: true
   }
 
@@ -2450,6 +2591,7 @@ export namespace Prisma {
     episodeNumber: number | null
     artistId: number | null
     albumId: number | null
+    folderId: number | null
     _count: TrackCountAggregateOutputType | null
     _avg: TrackAvgAggregateOutputType | null
     _sum: TrackSumAggregateOutputType | null
@@ -2487,6 +2629,7 @@ export namespace Prisma {
     episodeNumber?: boolean
     artistId?: boolean
     albumId?: boolean
+    folderId?: boolean
     artistEntity?: boolean | Track$artistEntityArgs<ExtArgs>
     albumEntity?: boolean | Track$albumEntityArgs<ExtArgs>
     likedByUsers?: boolean | Track$likedByUsersArgs<ExtArgs>
@@ -2494,6 +2637,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: boolean | Track$likedAsAudiobookByUsersArgs<ExtArgs>
     listenedAsAudiobookByUsers?: boolean | Track$listenedAsAudiobookByUsersArgs<ExtArgs>
     playlists?: boolean | Track$playlistsArgs<ExtArgs>
+    folder?: boolean | Track$folderArgs<ExtArgs>
     _count?: boolean | TrackCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["track"]>
 
@@ -2513,8 +2657,10 @@ export namespace Prisma {
     episodeNumber?: boolean
     artistId?: boolean
     albumId?: boolean
+    folderId?: boolean
     artistEntity?: boolean | Track$artistEntityArgs<ExtArgs>
     albumEntity?: boolean | Track$albumEntityArgs<ExtArgs>
+    folder?: boolean | Track$folderArgs<ExtArgs>
   }, ExtArgs["result"]["track"]>
 
   export type TrackSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2533,8 +2679,10 @@ export namespace Prisma {
     episodeNumber?: boolean
     artistId?: boolean
     albumId?: boolean
+    folderId?: boolean
     artistEntity?: boolean | Track$artistEntityArgs<ExtArgs>
     albumEntity?: boolean | Track$albumEntityArgs<ExtArgs>
+    folder?: boolean | Track$folderArgs<ExtArgs>
   }, ExtArgs["result"]["track"]>
 
   export type TrackSelectScalar = {
@@ -2553,9 +2701,10 @@ export namespace Prisma {
     episodeNumber?: boolean
     artistId?: boolean
     albumId?: boolean
+    folderId?: boolean
   }
 
-  export type TrackOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "path" | "artist" | "album" | "cover" | "duration" | "lyrics" | "index" | "type" | "createdAt" | "fileModifiedAt" | "episodeNumber" | "artistId" | "albumId", ExtArgs["result"]["track"]>
+  export type TrackOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "path" | "artist" | "album" | "cover" | "duration" | "lyrics" | "index" | "type" | "createdAt" | "fileModifiedAt" | "episodeNumber" | "artistId" | "albumId" | "folderId", ExtArgs["result"]["track"]>
   export type TrackInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     artistEntity?: boolean | Track$artistEntityArgs<ExtArgs>
     albumEntity?: boolean | Track$albumEntityArgs<ExtArgs>
@@ -2564,15 +2713,18 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: boolean | Track$likedAsAudiobookByUsersArgs<ExtArgs>
     listenedAsAudiobookByUsers?: boolean | Track$listenedAsAudiobookByUsersArgs<ExtArgs>
     playlists?: boolean | Track$playlistsArgs<ExtArgs>
+    folder?: boolean | Track$folderArgs<ExtArgs>
     _count?: boolean | TrackCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type TrackIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     artistEntity?: boolean | Track$artistEntityArgs<ExtArgs>
     albumEntity?: boolean | Track$albumEntityArgs<ExtArgs>
+    folder?: boolean | Track$folderArgs<ExtArgs>
   }
   export type TrackIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     artistEntity?: boolean | Track$artistEntityArgs<ExtArgs>
     albumEntity?: boolean | Track$albumEntityArgs<ExtArgs>
+    folder?: boolean | Track$folderArgs<ExtArgs>
   }
 
   export type $TrackPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2588,6 +2740,7 @@ export namespace Prisma {
       likedAsAudiobookByUsers: Prisma.$UserAudiobookLikePayload<ExtArgs>[]
       listenedAsAudiobookByUsers: Prisma.$UserAudiobookHistoryPayload<ExtArgs>[]
       playlists: Prisma.$PlaylistPayload<ExtArgs>[]
+      folder: Prisma.$FolderPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -2605,6 +2758,7 @@ export namespace Prisma {
       episodeNumber: number | null
       artistId: number | null
       albumId: number | null
+      folderId: number | null
     }, ExtArgs["result"]["track"]>
     composites: {}
   }
@@ -3006,6 +3160,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers<T extends Track$likedAsAudiobookByUsersArgs<ExtArgs> = {}>(args?: Subset<T, Track$likedAsAudiobookByUsersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserAudiobookLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     listenedAsAudiobookByUsers<T extends Track$listenedAsAudiobookByUsersArgs<ExtArgs> = {}>(args?: Subset<T, Track$listenedAsAudiobookByUsersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserAudiobookHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     playlists<T extends Track$playlistsArgs<ExtArgs> = {}>(args?: Subset<T, Track$playlistsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaylistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    folder<T extends Track$folderArgs<ExtArgs> = {}>(args?: Subset<T, Track$folderArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3050,6 +3205,7 @@ export namespace Prisma {
     readonly episodeNumber: FieldRef<"Track", 'Int'>
     readonly artistId: FieldRef<"Track", 'Int'>
     readonly albumId: FieldRef<"Track", 'Int'>
+    readonly folderId: FieldRef<"Track", 'Int'>
   }
     
 
@@ -3599,6 +3755,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: PlaylistScalarFieldEnum | PlaylistScalarFieldEnum[]
+  }
+
+  /**
+   * Track.folder
+   */
+  export type Track$folderArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    where?: FolderWhereInput
   }
 
   /**
@@ -16170,6 +16345,1177 @@ export namespace Prisma {
 
 
   /**
+   * Model Folder
+   */
+
+  export type AggregateFolder = {
+    _count: FolderCountAggregateOutputType | null
+    _avg: FolderAvgAggregateOutputType | null
+    _sum: FolderSumAggregateOutputType | null
+    _min: FolderMinAggregateOutputType | null
+    _max: FolderMaxAggregateOutputType | null
+  }
+
+  export type FolderAvgAggregateOutputType = {
+    id: number | null
+    parentId: number | null
+  }
+
+  export type FolderSumAggregateOutputType = {
+    id: number | null
+    parentId: number | null
+  }
+
+  export type FolderMinAggregateOutputType = {
+    id: number | null
+    path: string | null
+    name: string | null
+    parentId: number | null
+    type: $Enums.TrackType | null
+  }
+
+  export type FolderMaxAggregateOutputType = {
+    id: number | null
+    path: string | null
+    name: string | null
+    parentId: number | null
+    type: $Enums.TrackType | null
+  }
+
+  export type FolderCountAggregateOutputType = {
+    id: number
+    path: number
+    name: number
+    parentId: number
+    type: number
+    _all: number
+  }
+
+
+  export type FolderAvgAggregateInputType = {
+    id?: true
+    parentId?: true
+  }
+
+  export type FolderSumAggregateInputType = {
+    id?: true
+    parentId?: true
+  }
+
+  export type FolderMinAggregateInputType = {
+    id?: true
+    path?: true
+    name?: true
+    parentId?: true
+    type?: true
+  }
+
+  export type FolderMaxAggregateInputType = {
+    id?: true
+    path?: true
+    name?: true
+    parentId?: true
+    type?: true
+  }
+
+  export type FolderCountAggregateInputType = {
+    id?: true
+    path?: true
+    name?: true
+    parentId?: true
+    type?: true
+    _all?: true
+  }
+
+  export type FolderAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Folder to aggregate.
+     */
+    where?: FolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Folders to fetch.
+     */
+    orderBy?: FolderOrderByWithRelationInput | FolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Folders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Folders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Folders
+    **/
+    _count?: true | FolderCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FolderAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FolderSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FolderMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FolderMaxAggregateInputType
+  }
+
+  export type GetFolderAggregateType<T extends FolderAggregateArgs> = {
+        [P in keyof T & keyof AggregateFolder]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFolder[P]>
+      : GetScalarType<T[P], AggregateFolder[P]>
+  }
+
+
+
+
+  export type FolderGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FolderWhereInput
+    orderBy?: FolderOrderByWithAggregationInput | FolderOrderByWithAggregationInput[]
+    by: FolderScalarFieldEnum[] | FolderScalarFieldEnum
+    having?: FolderScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FolderCountAggregateInputType | true
+    _avg?: FolderAvgAggregateInputType
+    _sum?: FolderSumAggregateInputType
+    _min?: FolderMinAggregateInputType
+    _max?: FolderMaxAggregateInputType
+  }
+
+  export type FolderGroupByOutputType = {
+    id: number
+    path: string
+    name: string
+    parentId: number | null
+    type: $Enums.TrackType
+    _count: FolderCountAggregateOutputType | null
+    _avg: FolderAvgAggregateOutputType | null
+    _sum: FolderSumAggregateOutputType | null
+    _min: FolderMinAggregateOutputType | null
+    _max: FolderMaxAggregateOutputType | null
+  }
+
+  type GetFolderGroupByPayload<T extends FolderGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FolderGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FolderGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FolderGroupByOutputType[P]>
+            : GetScalarType<T[P], FolderGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FolderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    path?: boolean
+    name?: boolean
+    parentId?: boolean
+    type?: boolean
+    parent?: boolean | Folder$parentArgs<ExtArgs>
+    children?: boolean | Folder$childrenArgs<ExtArgs>
+    tracks?: boolean | Folder$tracksArgs<ExtArgs>
+    _count?: boolean | FolderCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["folder"]>
+
+  export type FolderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    path?: boolean
+    name?: boolean
+    parentId?: boolean
+    type?: boolean
+    parent?: boolean | Folder$parentArgs<ExtArgs>
+  }, ExtArgs["result"]["folder"]>
+
+  export type FolderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    path?: boolean
+    name?: boolean
+    parentId?: boolean
+    type?: boolean
+    parent?: boolean | Folder$parentArgs<ExtArgs>
+  }, ExtArgs["result"]["folder"]>
+
+  export type FolderSelectScalar = {
+    id?: boolean
+    path?: boolean
+    name?: boolean
+    parentId?: boolean
+    type?: boolean
+  }
+
+  export type FolderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "path" | "name" | "parentId" | "type", ExtArgs["result"]["folder"]>
+  export type FolderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    parent?: boolean | Folder$parentArgs<ExtArgs>
+    children?: boolean | Folder$childrenArgs<ExtArgs>
+    tracks?: boolean | Folder$tracksArgs<ExtArgs>
+    _count?: boolean | FolderCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type FolderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    parent?: boolean | Folder$parentArgs<ExtArgs>
+  }
+  export type FolderIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    parent?: boolean | Folder$parentArgs<ExtArgs>
+  }
+
+  export type $FolderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Folder"
+    objects: {
+      parent: Prisma.$FolderPayload<ExtArgs> | null
+      children: Prisma.$FolderPayload<ExtArgs>[]
+      tracks: Prisma.$TrackPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      path: string
+      name: string
+      parentId: number | null
+      type: $Enums.TrackType
+    }, ExtArgs["result"]["folder"]>
+    composites: {}
+  }
+
+  type FolderGetPayload<S extends boolean | null | undefined | FolderDefaultArgs> = $Result.GetResult<Prisma.$FolderPayload, S>
+
+  type FolderCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FolderFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FolderCountAggregateInputType | true
+    }
+
+  export interface FolderDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Folder'], meta: { name: 'Folder' } }
+    /**
+     * Find zero or one Folder that matches the filter.
+     * @param {FolderFindUniqueArgs} args - Arguments to find a Folder
+     * @example
+     * // Get one Folder
+     * const folder = await prisma.folder.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FolderFindUniqueArgs>(args: SelectSubset<T, FolderFindUniqueArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Folder that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FolderFindUniqueOrThrowArgs} args - Arguments to find a Folder
+     * @example
+     * // Get one Folder
+     * const folder = await prisma.folder.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FolderFindUniqueOrThrowArgs>(args: SelectSubset<T, FolderFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Folder that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FolderFindFirstArgs} args - Arguments to find a Folder
+     * @example
+     * // Get one Folder
+     * const folder = await prisma.folder.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FolderFindFirstArgs>(args?: SelectSubset<T, FolderFindFirstArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Folder that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FolderFindFirstOrThrowArgs} args - Arguments to find a Folder
+     * @example
+     * // Get one Folder
+     * const folder = await prisma.folder.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FolderFindFirstOrThrowArgs>(args?: SelectSubset<T, FolderFindFirstOrThrowArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Folders that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FolderFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Folders
+     * const folders = await prisma.folder.findMany()
+     * 
+     * // Get first 10 Folders
+     * const folders = await prisma.folder.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const folderWithIdOnly = await prisma.folder.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FolderFindManyArgs>(args?: SelectSubset<T, FolderFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Folder.
+     * @param {FolderCreateArgs} args - Arguments to create a Folder.
+     * @example
+     * // Create one Folder
+     * const Folder = await prisma.folder.create({
+     *   data: {
+     *     // ... data to create a Folder
+     *   }
+     * })
+     * 
+     */
+    create<T extends FolderCreateArgs>(args: SelectSubset<T, FolderCreateArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Folders.
+     * @param {FolderCreateManyArgs} args - Arguments to create many Folders.
+     * @example
+     * // Create many Folders
+     * const folder = await prisma.folder.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FolderCreateManyArgs>(args?: SelectSubset<T, FolderCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Folders and returns the data saved in the database.
+     * @param {FolderCreateManyAndReturnArgs} args - Arguments to create many Folders.
+     * @example
+     * // Create many Folders
+     * const folder = await prisma.folder.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Folders and only return the `id`
+     * const folderWithIdOnly = await prisma.folder.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FolderCreateManyAndReturnArgs>(args?: SelectSubset<T, FolderCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Folder.
+     * @param {FolderDeleteArgs} args - Arguments to delete one Folder.
+     * @example
+     * // Delete one Folder
+     * const Folder = await prisma.folder.delete({
+     *   where: {
+     *     // ... filter to delete one Folder
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FolderDeleteArgs>(args: SelectSubset<T, FolderDeleteArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Folder.
+     * @param {FolderUpdateArgs} args - Arguments to update one Folder.
+     * @example
+     * // Update one Folder
+     * const folder = await prisma.folder.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FolderUpdateArgs>(args: SelectSubset<T, FolderUpdateArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Folders.
+     * @param {FolderDeleteManyArgs} args - Arguments to filter Folders to delete.
+     * @example
+     * // Delete a few Folders
+     * const { count } = await prisma.folder.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FolderDeleteManyArgs>(args?: SelectSubset<T, FolderDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Folders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FolderUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Folders
+     * const folder = await prisma.folder.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FolderUpdateManyArgs>(args: SelectSubset<T, FolderUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Folders and returns the data updated in the database.
+     * @param {FolderUpdateManyAndReturnArgs} args - Arguments to update many Folders.
+     * @example
+     * // Update many Folders
+     * const folder = await prisma.folder.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Folders and only return the `id`
+     * const folderWithIdOnly = await prisma.folder.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FolderUpdateManyAndReturnArgs>(args: SelectSubset<T, FolderUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Folder.
+     * @param {FolderUpsertArgs} args - Arguments to update or create a Folder.
+     * @example
+     * // Update or create a Folder
+     * const folder = await prisma.folder.upsert({
+     *   create: {
+     *     // ... data to create a Folder
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Folder we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FolderUpsertArgs>(args: SelectSubset<T, FolderUpsertArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Folders.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FolderCountArgs} args - Arguments to filter Folders to count.
+     * @example
+     * // Count the number of Folders
+     * const count = await prisma.folder.count({
+     *   where: {
+     *     // ... the filter for the Folders we want to count
+     *   }
+     * })
+    **/
+    count<T extends FolderCountArgs>(
+      args?: Subset<T, FolderCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FolderCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Folder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FolderAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FolderAggregateArgs>(args: Subset<T, FolderAggregateArgs>): Prisma.PrismaPromise<GetFolderAggregateType<T>>
+
+    /**
+     * Group by Folder.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FolderGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FolderGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FolderGroupByArgs['orderBy'] }
+        : { orderBy?: FolderGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FolderGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFolderGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Folder model
+   */
+  readonly fields: FolderFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Folder.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FolderClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    parent<T extends Folder$parentArgs<ExtArgs> = {}>(args?: Subset<T, Folder$parentArgs<ExtArgs>>): Prisma__FolderClient<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    children<T extends Folder$childrenArgs<ExtArgs> = {}>(args?: Subset<T, Folder$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FolderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    tracks<T extends Folder$tracksArgs<ExtArgs> = {}>(args?: Subset<T, Folder$tracksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Folder model
+   */
+  interface FolderFieldRefs {
+    readonly id: FieldRef<"Folder", 'Int'>
+    readonly path: FieldRef<"Folder", 'String'>
+    readonly name: FieldRef<"Folder", 'String'>
+    readonly parentId: FieldRef<"Folder", 'Int'>
+    readonly type: FieldRef<"Folder", 'TrackType'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Folder findUnique
+   */
+  export type FolderFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    /**
+     * Filter, which Folder to fetch.
+     */
+    where: FolderWhereUniqueInput
+  }
+
+  /**
+   * Folder findUniqueOrThrow
+   */
+  export type FolderFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    /**
+     * Filter, which Folder to fetch.
+     */
+    where: FolderWhereUniqueInput
+  }
+
+  /**
+   * Folder findFirst
+   */
+  export type FolderFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    /**
+     * Filter, which Folder to fetch.
+     */
+    where?: FolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Folders to fetch.
+     */
+    orderBy?: FolderOrderByWithRelationInput | FolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Folders.
+     */
+    cursor?: FolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Folders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Folders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Folders.
+     */
+    distinct?: FolderScalarFieldEnum | FolderScalarFieldEnum[]
+  }
+
+  /**
+   * Folder findFirstOrThrow
+   */
+  export type FolderFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    /**
+     * Filter, which Folder to fetch.
+     */
+    where?: FolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Folders to fetch.
+     */
+    orderBy?: FolderOrderByWithRelationInput | FolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Folders.
+     */
+    cursor?: FolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Folders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Folders.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Folders.
+     */
+    distinct?: FolderScalarFieldEnum | FolderScalarFieldEnum[]
+  }
+
+  /**
+   * Folder findMany
+   */
+  export type FolderFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    /**
+     * Filter, which Folders to fetch.
+     */
+    where?: FolderWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Folders to fetch.
+     */
+    orderBy?: FolderOrderByWithRelationInput | FolderOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Folders.
+     */
+    cursor?: FolderWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Folders from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Folders.
+     */
+    skip?: number
+    distinct?: FolderScalarFieldEnum | FolderScalarFieldEnum[]
+  }
+
+  /**
+   * Folder create
+   */
+  export type FolderCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Folder.
+     */
+    data: XOR<FolderCreateInput, FolderUncheckedCreateInput>
+  }
+
+  /**
+   * Folder createMany
+   */
+  export type FolderCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Folders.
+     */
+    data: FolderCreateManyInput | FolderCreateManyInput[]
+  }
+
+  /**
+   * Folder createManyAndReturn
+   */
+  export type FolderCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * The data used to create many Folders.
+     */
+    data: FolderCreateManyInput | FolderCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Folder update
+   */
+  export type FolderUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Folder.
+     */
+    data: XOR<FolderUpdateInput, FolderUncheckedUpdateInput>
+    /**
+     * Choose, which Folder to update.
+     */
+    where: FolderWhereUniqueInput
+  }
+
+  /**
+   * Folder updateMany
+   */
+  export type FolderUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Folders.
+     */
+    data: XOR<FolderUpdateManyMutationInput, FolderUncheckedUpdateManyInput>
+    /**
+     * Filter which Folders to update
+     */
+    where?: FolderWhereInput
+    /**
+     * Limit how many Folders to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Folder updateManyAndReturn
+   */
+  export type FolderUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * The data used to update Folders.
+     */
+    data: XOR<FolderUpdateManyMutationInput, FolderUncheckedUpdateManyInput>
+    /**
+     * Filter which Folders to update
+     */
+    where?: FolderWhereInput
+    /**
+     * Limit how many Folders to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Folder upsert
+   */
+  export type FolderUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Folder to update in case it exists.
+     */
+    where: FolderWhereUniqueInput
+    /**
+     * In case the Folder found by the `where` argument doesn't exist, create a new Folder with this data.
+     */
+    create: XOR<FolderCreateInput, FolderUncheckedCreateInput>
+    /**
+     * In case the Folder was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FolderUpdateInput, FolderUncheckedUpdateInput>
+  }
+
+  /**
+   * Folder delete
+   */
+  export type FolderDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    /**
+     * Filter which Folder to delete.
+     */
+    where: FolderWhereUniqueInput
+  }
+
+  /**
+   * Folder deleteMany
+   */
+  export type FolderDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Folders to delete
+     */
+    where?: FolderWhereInput
+    /**
+     * Limit how many Folders to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Folder.parent
+   */
+  export type Folder$parentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    where?: FolderWhereInput
+  }
+
+  /**
+   * Folder.children
+   */
+  export type Folder$childrenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+    where?: FolderWhereInput
+    orderBy?: FolderOrderByWithRelationInput | FolderOrderByWithRelationInput[]
+    cursor?: FolderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FolderScalarFieldEnum | FolderScalarFieldEnum[]
+  }
+
+  /**
+   * Folder.tracks
+   */
+  export type Folder$tracksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: TrackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: TrackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TrackInclude<ExtArgs> | null
+    where?: TrackWhereInput
+    orderBy?: TrackOrderByWithRelationInput | TrackOrderByWithRelationInput[]
+    cursor?: TrackWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TrackScalarFieldEnum | TrackScalarFieldEnum[]
+  }
+
+  /**
+   * Folder without action
+   */
+  export type FolderDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Folder
+     */
+    select?: FolderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Folder
+     */
+    omit?: FolderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FolderInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -16195,7 +17541,8 @@ export namespace Prisma {
     fileModifiedAt: 'fileModifiedAt',
     episodeNumber: 'episodeNumber',
     artistId: 'artistId',
-    albumId: 'albumId'
+    albumId: 'albumId',
+    folderId: 'folderId'
   };
 
   export type TrackScalarFieldEnum = (typeof TrackScalarFieldEnum)[keyof typeof TrackScalarFieldEnum]
@@ -16322,6 +17669,17 @@ export namespace Prisma {
   export type PlaylistScalarFieldEnum = (typeof PlaylistScalarFieldEnum)[keyof typeof PlaylistScalarFieldEnum]
 
 
+  export const FolderScalarFieldEnum: {
+    id: 'id',
+    path: 'path',
+    name: 'name',
+    parentId: 'parentId',
+    type: 'type'
+  };
+
+  export type FolderScalarFieldEnum = (typeof FolderScalarFieldEnum)[keyof typeof FolderScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -16407,6 +17765,7 @@ export namespace Prisma {
     episodeNumber?: IntNullableFilter<"Track"> | number | null
     artistId?: IntNullableFilter<"Track"> | number | null
     albumId?: IntNullableFilter<"Track"> | number | null
+    folderId?: IntNullableFilter<"Track"> | number | null
     artistEntity?: XOR<ArtistNullableScalarRelationFilter, ArtistWhereInput> | null
     albumEntity?: XOR<AlbumNullableScalarRelationFilter, AlbumWhereInput> | null
     likedByUsers?: UserTrackLikeListRelationFilter
@@ -16414,6 +17773,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeListRelationFilter
     listenedAsAudiobookByUsers?: UserAudiobookHistoryListRelationFilter
     playlists?: PlaylistListRelationFilter
+    folder?: XOR<FolderNullableScalarRelationFilter, FolderWhereInput> | null
   }
 
   export type TrackOrderByWithRelationInput = {
@@ -16432,6 +17792,7 @@ export namespace Prisma {
     episodeNumber?: SortOrderInput | SortOrder
     artistId?: SortOrderInput | SortOrder
     albumId?: SortOrderInput | SortOrder
+    folderId?: SortOrderInput | SortOrder
     artistEntity?: ArtistOrderByWithRelationInput
     albumEntity?: AlbumOrderByWithRelationInput
     likedByUsers?: UserTrackLikeOrderByRelationAggregateInput
@@ -16439,6 +17800,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeOrderByRelationAggregateInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryOrderByRelationAggregateInput
     playlists?: PlaylistOrderByRelationAggregateInput
+    folder?: FolderOrderByWithRelationInput
   }
 
   export type TrackWhereUniqueInput = Prisma.AtLeast<{
@@ -16460,6 +17822,7 @@ export namespace Prisma {
     episodeNumber?: IntNullableFilter<"Track"> | number | null
     artistId?: IntNullableFilter<"Track"> | number | null
     albumId?: IntNullableFilter<"Track"> | number | null
+    folderId?: IntNullableFilter<"Track"> | number | null
     artistEntity?: XOR<ArtistNullableScalarRelationFilter, ArtistWhereInput> | null
     albumEntity?: XOR<AlbumNullableScalarRelationFilter, AlbumWhereInput> | null
     likedByUsers?: UserTrackLikeListRelationFilter
@@ -16467,6 +17830,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeListRelationFilter
     listenedAsAudiobookByUsers?: UserAudiobookHistoryListRelationFilter
     playlists?: PlaylistListRelationFilter
+    folder?: XOR<FolderNullableScalarRelationFilter, FolderWhereInput> | null
   }, "id">
 
   export type TrackOrderByWithAggregationInput = {
@@ -16485,6 +17849,7 @@ export namespace Prisma {
     episodeNumber?: SortOrderInput | SortOrder
     artistId?: SortOrderInput | SortOrder
     albumId?: SortOrderInput | SortOrder
+    folderId?: SortOrderInput | SortOrder
     _count?: TrackCountOrderByAggregateInput
     _avg?: TrackAvgOrderByAggregateInput
     _max?: TrackMaxOrderByAggregateInput
@@ -16511,6 +17876,7 @@ export namespace Prisma {
     episodeNumber?: IntNullableWithAggregatesFilter<"Track"> | number | null
     artistId?: IntNullableWithAggregatesFilter<"Track"> | number | null
     albumId?: IntNullableWithAggregatesFilter<"Track"> | number | null
+    folderId?: IntNullableWithAggregatesFilter<"Track"> | number | null
   }
 
   export type AlbumWhereInput = {
@@ -17195,6 +18561,69 @@ export namespace Prisma {
     userId?: IntWithAggregatesFilter<"Playlist"> | number
   }
 
+  export type FolderWhereInput = {
+    AND?: FolderWhereInput | FolderWhereInput[]
+    OR?: FolderWhereInput[]
+    NOT?: FolderWhereInput | FolderWhereInput[]
+    id?: IntFilter<"Folder"> | number
+    path?: StringFilter<"Folder"> | string
+    name?: StringFilter<"Folder"> | string
+    parentId?: IntNullableFilter<"Folder"> | number | null
+    type?: EnumTrackTypeFilter<"Folder"> | $Enums.TrackType
+    parent?: XOR<FolderNullableScalarRelationFilter, FolderWhereInput> | null
+    children?: FolderListRelationFilter
+    tracks?: TrackListRelationFilter
+  }
+
+  export type FolderOrderByWithRelationInput = {
+    id?: SortOrder
+    path?: SortOrder
+    name?: SortOrder
+    parentId?: SortOrderInput | SortOrder
+    type?: SortOrder
+    parent?: FolderOrderByWithRelationInput
+    children?: FolderOrderByRelationAggregateInput
+    tracks?: TrackOrderByRelationAggregateInput
+  }
+
+  export type FolderWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    path?: string
+    AND?: FolderWhereInput | FolderWhereInput[]
+    OR?: FolderWhereInput[]
+    NOT?: FolderWhereInput | FolderWhereInput[]
+    name?: StringFilter<"Folder"> | string
+    parentId?: IntNullableFilter<"Folder"> | number | null
+    type?: EnumTrackTypeFilter<"Folder"> | $Enums.TrackType
+    parent?: XOR<FolderNullableScalarRelationFilter, FolderWhereInput> | null
+    children?: FolderListRelationFilter
+    tracks?: TrackListRelationFilter
+  }, "id" | "path">
+
+  export type FolderOrderByWithAggregationInput = {
+    id?: SortOrder
+    path?: SortOrder
+    name?: SortOrder
+    parentId?: SortOrderInput | SortOrder
+    type?: SortOrder
+    _count?: FolderCountOrderByAggregateInput
+    _avg?: FolderAvgOrderByAggregateInput
+    _max?: FolderMaxOrderByAggregateInput
+    _min?: FolderMinOrderByAggregateInput
+    _sum?: FolderSumOrderByAggregateInput
+  }
+
+  export type FolderScalarWhereWithAggregatesInput = {
+    AND?: FolderScalarWhereWithAggregatesInput | FolderScalarWhereWithAggregatesInput[]
+    OR?: FolderScalarWhereWithAggregatesInput[]
+    NOT?: FolderScalarWhereWithAggregatesInput | FolderScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Folder"> | number
+    path?: StringWithAggregatesFilter<"Folder"> | string
+    name?: StringWithAggregatesFilter<"Folder"> | string
+    parentId?: IntNullableWithAggregatesFilter<"Folder"> | number | null
+    type?: EnumTrackTypeWithAggregatesFilter<"Folder"> | $Enums.TrackType
+  }
+
   export type TrackCreateInput = {
     name: string
     path: string
@@ -17215,6 +18644,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeCreateNestedManyWithoutTrackInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryCreateNestedManyWithoutTrackInput
     playlists?: PlaylistCreateNestedManyWithoutTracksInput
+    folder?: FolderCreateNestedOneWithoutTracksInput
   }
 
   export type TrackUncheckedCreateInput = {
@@ -17233,6 +18663,7 @@ export namespace Prisma {
     episodeNumber?: number | null
     artistId?: number | null
     albumId?: number | null
+    folderId?: number | null
     likedByUsers?: UserTrackLikeUncheckedCreateNestedManyWithoutTrackInput
     listenedByUsers?: UserTrackHistoryUncheckedCreateNestedManyWithoutTrackInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedCreateNestedManyWithoutTrackInput
@@ -17260,6 +18691,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUpdateManyWithoutTrackNestedInput
     playlists?: PlaylistUpdateManyWithoutTracksNestedInput
+    folder?: FolderUpdateOneWithoutTracksNestedInput
   }
 
   export type TrackUncheckedUpdateInput = {
@@ -17278,6 +18710,7 @@ export namespace Prisma {
     episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
     artistId?: NullableIntFieldUpdateOperationsInput | number | null
     albumId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
     likedByUsers?: UserTrackLikeUncheckedUpdateManyWithoutTrackNestedInput
     listenedByUsers?: UserTrackHistoryUncheckedUpdateManyWithoutTrackNestedInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedUpdateManyWithoutTrackNestedInput
@@ -17301,6 +18734,7 @@ export namespace Prisma {
     episodeNumber?: number | null
     artistId?: number | null
     albumId?: number | null
+    folderId?: number | null
   }
 
   export type TrackUpdateManyMutationInput = {
@@ -17334,6 +18768,7 @@ export namespace Prisma {
     episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
     artistId?: NullableIntFieldUpdateOperationsInput | number | null
     albumId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type AlbumCreateInput = {
@@ -17960,6 +19395,66 @@ export namespace Prisma {
     userId?: IntFieldUpdateOperationsInput | number
   }
 
+  export type FolderCreateInput = {
+    path: string
+    name: string
+    type?: $Enums.TrackType
+    parent?: FolderCreateNestedOneWithoutChildrenInput
+    children?: FolderCreateNestedManyWithoutParentInput
+    tracks?: TrackCreateNestedManyWithoutFolderInput
+  }
+
+  export type FolderUncheckedCreateInput = {
+    id?: number
+    path: string
+    name: string
+    parentId?: number | null
+    type?: $Enums.TrackType
+    children?: FolderUncheckedCreateNestedManyWithoutParentInput
+    tracks?: TrackUncheckedCreateNestedManyWithoutFolderInput
+  }
+
+  export type FolderUpdateInput = {
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    parent?: FolderUpdateOneWithoutChildrenNestedInput
+    children?: FolderUpdateManyWithoutParentNestedInput
+    tracks?: TrackUpdateManyWithoutFolderNestedInput
+  }
+
+  export type FolderUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableIntFieldUpdateOperationsInput | number | null
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    children?: FolderUncheckedUpdateManyWithoutParentNestedInput
+    tracks?: TrackUncheckedUpdateManyWithoutFolderNestedInput
+  }
+
+  export type FolderCreateManyInput = {
+    id?: number
+    path: string
+    name: string
+    parentId?: number | null
+    type?: $Enums.TrackType
+  }
+
+  export type FolderUpdateManyMutationInput = {
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+  }
+
+  export type FolderUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableIntFieldUpdateOperationsInput | number | null
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -18079,6 +19574,11 @@ export namespace Prisma {
     none?: PlaylistWhereInput
   }
 
+  export type FolderNullableScalarRelationFilter = {
+    is?: FolderWhereInput | null
+    isNot?: FolderWhereInput | null
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -18120,6 +19620,7 @@ export namespace Prisma {
     episodeNumber?: SortOrder
     artistId?: SortOrder
     albumId?: SortOrder
+    folderId?: SortOrder
   }
 
   export type TrackAvgOrderByAggregateInput = {
@@ -18129,6 +19630,7 @@ export namespace Prisma {
     episodeNumber?: SortOrder
     artistId?: SortOrder
     albumId?: SortOrder
+    folderId?: SortOrder
   }
 
   export type TrackMaxOrderByAggregateInput = {
@@ -18147,6 +19649,7 @@ export namespace Prisma {
     episodeNumber?: SortOrder
     artistId?: SortOrder
     albumId?: SortOrder
+    folderId?: SortOrder
   }
 
   export type TrackMinOrderByAggregateInput = {
@@ -18165,6 +19668,7 @@ export namespace Prisma {
     episodeNumber?: SortOrder
     artistId?: SortOrder
     albumId?: SortOrder
+    folderId?: SortOrder
   }
 
   export type TrackSumOrderByAggregateInput = {
@@ -18174,6 +19678,7 @@ export namespace Prisma {
     episodeNumber?: SortOrder
     artistId?: SortOrder
     albumId?: SortOrder
+    folderId?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -18744,6 +20249,50 @@ export namespace Prisma {
     userId?: SortOrder
   }
 
+  export type FolderListRelationFilter = {
+    every?: FolderWhereInput
+    some?: FolderWhereInput
+    none?: FolderWhereInput
+  }
+
+  export type FolderOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FolderCountOrderByAggregateInput = {
+    id?: SortOrder
+    path?: SortOrder
+    name?: SortOrder
+    parentId?: SortOrder
+    type?: SortOrder
+  }
+
+  export type FolderAvgOrderByAggregateInput = {
+    id?: SortOrder
+    parentId?: SortOrder
+  }
+
+  export type FolderMaxOrderByAggregateInput = {
+    id?: SortOrder
+    path?: SortOrder
+    name?: SortOrder
+    parentId?: SortOrder
+    type?: SortOrder
+  }
+
+  export type FolderMinOrderByAggregateInput = {
+    id?: SortOrder
+    path?: SortOrder
+    name?: SortOrder
+    parentId?: SortOrder
+    type?: SortOrder
+  }
+
+  export type FolderSumOrderByAggregateInput = {
+    id?: SortOrder
+    parentId?: SortOrder
+  }
+
   export type ArtistCreateNestedOneWithoutTracksInput = {
     create?: XOR<ArtistCreateWithoutTracksInput, ArtistUncheckedCreateWithoutTracksInput>
     connectOrCreate?: ArtistCreateOrConnectWithoutTracksInput
@@ -18788,6 +20337,12 @@ export namespace Prisma {
     create?: XOR<PlaylistCreateWithoutTracksInput, PlaylistUncheckedCreateWithoutTracksInput> | PlaylistCreateWithoutTracksInput[] | PlaylistUncheckedCreateWithoutTracksInput[]
     connectOrCreate?: PlaylistCreateOrConnectWithoutTracksInput | PlaylistCreateOrConnectWithoutTracksInput[]
     connect?: PlaylistWhereUniqueInput | PlaylistWhereUniqueInput[]
+  }
+
+  export type FolderCreateNestedOneWithoutTracksInput = {
+    create?: XOR<FolderCreateWithoutTracksInput, FolderUncheckedCreateWithoutTracksInput>
+    connectOrCreate?: FolderCreateOrConnectWithoutTracksInput
+    connect?: FolderWhereUniqueInput
   }
 
   export type UserTrackLikeUncheckedCreateNestedManyWithoutTrackInput = {
@@ -18939,6 +20494,16 @@ export namespace Prisma {
     update?: PlaylistUpdateWithWhereUniqueWithoutTracksInput | PlaylistUpdateWithWhereUniqueWithoutTracksInput[]
     updateMany?: PlaylistUpdateManyWithWhereWithoutTracksInput | PlaylistUpdateManyWithWhereWithoutTracksInput[]
     deleteMany?: PlaylistScalarWhereInput | PlaylistScalarWhereInput[]
+  }
+
+  export type FolderUpdateOneWithoutTracksNestedInput = {
+    create?: XOR<FolderCreateWithoutTracksInput, FolderUncheckedCreateWithoutTracksInput>
+    connectOrCreate?: FolderCreateOrConnectWithoutTracksInput
+    upsert?: FolderUpsertWithoutTracksInput
+    disconnect?: FolderWhereInput | boolean
+    delete?: FolderWhereInput | boolean
+    connect?: FolderWhereUniqueInput
+    update?: XOR<XOR<FolderUpdateToOneWithWhereWithoutTracksInput, FolderUpdateWithoutTracksInput>, FolderUncheckedUpdateWithoutTracksInput>
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -19816,6 +21381,106 @@ export namespace Prisma {
     deleteMany?: TrackScalarWhereInput | TrackScalarWhereInput[]
   }
 
+  export type FolderCreateNestedOneWithoutChildrenInput = {
+    create?: XOR<FolderCreateWithoutChildrenInput, FolderUncheckedCreateWithoutChildrenInput>
+    connectOrCreate?: FolderCreateOrConnectWithoutChildrenInput
+    connect?: FolderWhereUniqueInput
+  }
+
+  export type FolderCreateNestedManyWithoutParentInput = {
+    create?: XOR<FolderCreateWithoutParentInput, FolderUncheckedCreateWithoutParentInput> | FolderCreateWithoutParentInput[] | FolderUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: FolderCreateOrConnectWithoutParentInput | FolderCreateOrConnectWithoutParentInput[]
+    createMany?: FolderCreateManyParentInputEnvelope
+    connect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+  }
+
+  export type TrackCreateNestedManyWithoutFolderInput = {
+    create?: XOR<TrackCreateWithoutFolderInput, TrackUncheckedCreateWithoutFolderInput> | TrackCreateWithoutFolderInput[] | TrackUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: TrackCreateOrConnectWithoutFolderInput | TrackCreateOrConnectWithoutFolderInput[]
+    createMany?: TrackCreateManyFolderInputEnvelope
+    connect?: TrackWhereUniqueInput | TrackWhereUniqueInput[]
+  }
+
+  export type FolderUncheckedCreateNestedManyWithoutParentInput = {
+    create?: XOR<FolderCreateWithoutParentInput, FolderUncheckedCreateWithoutParentInput> | FolderCreateWithoutParentInput[] | FolderUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: FolderCreateOrConnectWithoutParentInput | FolderCreateOrConnectWithoutParentInput[]
+    createMany?: FolderCreateManyParentInputEnvelope
+    connect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+  }
+
+  export type TrackUncheckedCreateNestedManyWithoutFolderInput = {
+    create?: XOR<TrackCreateWithoutFolderInput, TrackUncheckedCreateWithoutFolderInput> | TrackCreateWithoutFolderInput[] | TrackUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: TrackCreateOrConnectWithoutFolderInput | TrackCreateOrConnectWithoutFolderInput[]
+    createMany?: TrackCreateManyFolderInputEnvelope
+    connect?: TrackWhereUniqueInput | TrackWhereUniqueInput[]
+  }
+
+  export type FolderUpdateOneWithoutChildrenNestedInput = {
+    create?: XOR<FolderCreateWithoutChildrenInput, FolderUncheckedCreateWithoutChildrenInput>
+    connectOrCreate?: FolderCreateOrConnectWithoutChildrenInput
+    upsert?: FolderUpsertWithoutChildrenInput
+    disconnect?: FolderWhereInput | boolean
+    delete?: FolderWhereInput | boolean
+    connect?: FolderWhereUniqueInput
+    update?: XOR<XOR<FolderUpdateToOneWithWhereWithoutChildrenInput, FolderUpdateWithoutChildrenInput>, FolderUncheckedUpdateWithoutChildrenInput>
+  }
+
+  export type FolderUpdateManyWithoutParentNestedInput = {
+    create?: XOR<FolderCreateWithoutParentInput, FolderUncheckedCreateWithoutParentInput> | FolderCreateWithoutParentInput[] | FolderUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: FolderCreateOrConnectWithoutParentInput | FolderCreateOrConnectWithoutParentInput[]
+    upsert?: FolderUpsertWithWhereUniqueWithoutParentInput | FolderUpsertWithWhereUniqueWithoutParentInput[]
+    createMany?: FolderCreateManyParentInputEnvelope
+    set?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    disconnect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    delete?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    connect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    update?: FolderUpdateWithWhereUniqueWithoutParentInput | FolderUpdateWithWhereUniqueWithoutParentInput[]
+    updateMany?: FolderUpdateManyWithWhereWithoutParentInput | FolderUpdateManyWithWhereWithoutParentInput[]
+    deleteMany?: FolderScalarWhereInput | FolderScalarWhereInput[]
+  }
+
+  export type TrackUpdateManyWithoutFolderNestedInput = {
+    create?: XOR<TrackCreateWithoutFolderInput, TrackUncheckedCreateWithoutFolderInput> | TrackCreateWithoutFolderInput[] | TrackUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: TrackCreateOrConnectWithoutFolderInput | TrackCreateOrConnectWithoutFolderInput[]
+    upsert?: TrackUpsertWithWhereUniqueWithoutFolderInput | TrackUpsertWithWhereUniqueWithoutFolderInput[]
+    createMany?: TrackCreateManyFolderInputEnvelope
+    set?: TrackWhereUniqueInput | TrackWhereUniqueInput[]
+    disconnect?: TrackWhereUniqueInput | TrackWhereUniqueInput[]
+    delete?: TrackWhereUniqueInput | TrackWhereUniqueInput[]
+    connect?: TrackWhereUniqueInput | TrackWhereUniqueInput[]
+    update?: TrackUpdateWithWhereUniqueWithoutFolderInput | TrackUpdateWithWhereUniqueWithoutFolderInput[]
+    updateMany?: TrackUpdateManyWithWhereWithoutFolderInput | TrackUpdateManyWithWhereWithoutFolderInput[]
+    deleteMany?: TrackScalarWhereInput | TrackScalarWhereInput[]
+  }
+
+  export type FolderUncheckedUpdateManyWithoutParentNestedInput = {
+    create?: XOR<FolderCreateWithoutParentInput, FolderUncheckedCreateWithoutParentInput> | FolderCreateWithoutParentInput[] | FolderUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: FolderCreateOrConnectWithoutParentInput | FolderCreateOrConnectWithoutParentInput[]
+    upsert?: FolderUpsertWithWhereUniqueWithoutParentInput | FolderUpsertWithWhereUniqueWithoutParentInput[]
+    createMany?: FolderCreateManyParentInputEnvelope
+    set?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    disconnect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    delete?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    connect?: FolderWhereUniqueInput | FolderWhereUniqueInput[]
+    update?: FolderUpdateWithWhereUniqueWithoutParentInput | FolderUpdateWithWhereUniqueWithoutParentInput[]
+    updateMany?: FolderUpdateManyWithWhereWithoutParentInput | FolderUpdateManyWithWhereWithoutParentInput[]
+    deleteMany?: FolderScalarWhereInput | FolderScalarWhereInput[]
+  }
+
+  export type TrackUncheckedUpdateManyWithoutFolderNestedInput = {
+    create?: XOR<TrackCreateWithoutFolderInput, TrackUncheckedCreateWithoutFolderInput> | TrackCreateWithoutFolderInput[] | TrackUncheckedCreateWithoutFolderInput[]
+    connectOrCreate?: TrackCreateOrConnectWithoutFolderInput | TrackCreateOrConnectWithoutFolderInput[]
+    upsert?: TrackUpsertWithWhereUniqueWithoutFolderInput | TrackUpsertWithWhereUniqueWithoutFolderInput[]
+    createMany?: TrackCreateManyFolderInputEnvelope
+    set?: TrackWhereUniqueInput | TrackWhereUniqueInput[]
+    disconnect?: TrackWhereUniqueInput | TrackWhereUniqueInput[]
+    delete?: TrackWhereUniqueInput | TrackWhereUniqueInput[]
+    connect?: TrackWhereUniqueInput | TrackWhereUniqueInput[]
+    update?: TrackUpdateWithWhereUniqueWithoutFolderInput | TrackUpdateWithWhereUniqueWithoutFolderInput[]
+    updateMany?: TrackUpdateManyWithWhereWithoutFolderInput | TrackUpdateManyWithWhereWithoutFolderInput[]
+    deleteMany?: TrackScalarWhereInput | TrackScalarWhereInput[]
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -20190,6 +21855,28 @@ export namespace Prisma {
     create: XOR<PlaylistCreateWithoutTracksInput, PlaylistUncheckedCreateWithoutTracksInput>
   }
 
+  export type FolderCreateWithoutTracksInput = {
+    path: string
+    name: string
+    type?: $Enums.TrackType
+    parent?: FolderCreateNestedOneWithoutChildrenInput
+    children?: FolderCreateNestedManyWithoutParentInput
+  }
+
+  export type FolderUncheckedCreateWithoutTracksInput = {
+    id?: number
+    path: string
+    name: string
+    parentId?: number | null
+    type?: $Enums.TrackType
+    children?: FolderUncheckedCreateNestedManyWithoutParentInput
+  }
+
+  export type FolderCreateOrConnectWithoutTracksInput = {
+    where: FolderWhereUniqueInput
+    create: XOR<FolderCreateWithoutTracksInput, FolderUncheckedCreateWithoutTracksInput>
+  }
+
   export type ArtistUpsertWithoutTracksInput = {
     update: XOR<ArtistUpdateWithoutTracksInput, ArtistUncheckedUpdateWithoutTracksInput>
     create: XOR<ArtistCreateWithoutTracksInput, ArtistUncheckedCreateWithoutTracksInput>
@@ -20383,6 +22070,34 @@ export namespace Prisma {
     userId?: IntFilter<"Playlist"> | number
   }
 
+  export type FolderUpsertWithoutTracksInput = {
+    update: XOR<FolderUpdateWithoutTracksInput, FolderUncheckedUpdateWithoutTracksInput>
+    create: XOR<FolderCreateWithoutTracksInput, FolderUncheckedCreateWithoutTracksInput>
+    where?: FolderWhereInput
+  }
+
+  export type FolderUpdateToOneWithWhereWithoutTracksInput = {
+    where?: FolderWhereInput
+    data: XOR<FolderUpdateWithoutTracksInput, FolderUncheckedUpdateWithoutTracksInput>
+  }
+
+  export type FolderUpdateWithoutTracksInput = {
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    parent?: FolderUpdateOneWithoutChildrenNestedInput
+    children?: FolderUpdateManyWithoutParentNestedInput
+  }
+
+  export type FolderUncheckedUpdateWithoutTracksInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableIntFieldUpdateOperationsInput | number | null
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    children?: FolderUncheckedUpdateManyWithoutParentNestedInput
+  }
+
   export type TrackCreateWithoutAlbumEntityInput = {
     name: string
     path: string
@@ -20402,6 +22117,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeCreateNestedManyWithoutTrackInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryCreateNestedManyWithoutTrackInput
     playlists?: PlaylistCreateNestedManyWithoutTracksInput
+    folder?: FolderCreateNestedOneWithoutTracksInput
   }
 
   export type TrackUncheckedCreateWithoutAlbumEntityInput = {
@@ -20419,6 +22135,7 @@ export namespace Prisma {
     fileModifiedAt?: Date | string | null
     episodeNumber?: number | null
     artistId?: number | null
+    folderId?: number | null
     likedByUsers?: UserTrackLikeUncheckedCreateNestedManyWithoutTrackInput
     listenedByUsers?: UserTrackHistoryUncheckedCreateNestedManyWithoutTrackInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedCreateNestedManyWithoutTrackInput
@@ -20510,6 +22227,7 @@ export namespace Prisma {
     episodeNumber?: IntNullableFilter<"Track"> | number | null
     artistId?: IntNullableFilter<"Track"> | number | null
     albumId?: IntNullableFilter<"Track"> | number | null
+    folderId?: IntNullableFilter<"Track"> | number | null
   }
 
   export type UserAlbumLikeUpsertWithWhereUniqueWithoutAlbumInput = {
@@ -20583,6 +22301,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeCreateNestedManyWithoutTrackInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryCreateNestedManyWithoutTrackInput
     playlists?: PlaylistCreateNestedManyWithoutTracksInput
+    folder?: FolderCreateNestedOneWithoutTracksInput
   }
 
   export type TrackUncheckedCreateWithoutArtistEntityInput = {
@@ -20600,6 +22319,7 @@ export namespace Prisma {
     fileModifiedAt?: Date | string | null
     episodeNumber?: number | null
     albumId?: number | null
+    folderId?: number | null
     likedByUsers?: UserTrackLikeUncheckedCreateNestedManyWithoutTrackInput
     listenedByUsers?: UserTrackHistoryUncheckedCreateNestedManyWithoutTrackInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedCreateNestedManyWithoutTrackInput
@@ -20683,6 +22403,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeCreateNestedManyWithoutTrackInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryCreateNestedManyWithoutTrackInput
     playlists?: PlaylistCreateNestedManyWithoutTracksInput
+    folder?: FolderCreateNestedOneWithoutTracksInput
   }
 
   export type TrackUncheckedCreateWithoutLikedByUsersInput = {
@@ -20701,6 +22422,7 @@ export namespace Prisma {
     episodeNumber?: number | null
     artistId?: number | null
     albumId?: number | null
+    folderId?: number | null
     listenedByUsers?: UserTrackHistoryUncheckedCreateNestedManyWithoutTrackInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedCreateNestedManyWithoutTrackInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUncheckedCreateNestedManyWithoutTrackInput
@@ -20780,6 +22502,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUpdateManyWithoutTrackNestedInput
     playlists?: PlaylistUpdateManyWithoutTracksNestedInput
+    folder?: FolderUpdateOneWithoutTracksNestedInput
   }
 
   export type TrackUncheckedUpdateWithoutLikedByUsersInput = {
@@ -20798,6 +22521,7 @@ export namespace Prisma {
     episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
     artistId?: NullableIntFieldUpdateOperationsInput | number | null
     albumId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
     listenedByUsers?: UserTrackHistoryUncheckedUpdateManyWithoutTrackNestedInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUncheckedUpdateManyWithoutTrackNestedInput
@@ -20855,6 +22579,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeCreateNestedManyWithoutTrackInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryCreateNestedManyWithoutTrackInput
     playlists?: PlaylistCreateNestedManyWithoutTracksInput
+    folder?: FolderCreateNestedOneWithoutTracksInput
   }
 
   export type TrackUncheckedCreateWithoutListenedByUsersInput = {
@@ -20873,6 +22598,7 @@ export namespace Prisma {
     episodeNumber?: number | null
     artistId?: number | null
     albumId?: number | null
+    folderId?: number | null
     likedByUsers?: UserTrackLikeUncheckedCreateNestedManyWithoutTrackInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedCreateNestedManyWithoutTrackInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUncheckedCreateNestedManyWithoutTrackInput
@@ -20974,6 +22700,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUpdateManyWithoutTrackNestedInput
     playlists?: PlaylistUpdateManyWithoutTracksNestedInput
+    folder?: FolderUpdateOneWithoutTracksNestedInput
   }
 
   export type TrackUncheckedUpdateWithoutListenedByUsersInput = {
@@ -20992,6 +22719,7 @@ export namespace Prisma {
     episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
     artistId?: NullableIntFieldUpdateOperationsInput | number | null
     albumId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
     likedByUsers?: UserTrackLikeUncheckedUpdateManyWithoutTrackNestedInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUncheckedUpdateManyWithoutTrackNestedInput
@@ -21333,6 +23061,7 @@ export namespace Prisma {
     listenedByUsers?: UserTrackHistoryCreateNestedManyWithoutTrackInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryCreateNestedManyWithoutTrackInput
     playlists?: PlaylistCreateNestedManyWithoutTracksInput
+    folder?: FolderCreateNestedOneWithoutTracksInput
   }
 
   export type TrackUncheckedCreateWithoutLikedAsAudiobookByUsersInput = {
@@ -21351,6 +23080,7 @@ export namespace Prisma {
     episodeNumber?: number | null
     artistId?: number | null
     albumId?: number | null
+    folderId?: number | null
     likedByUsers?: UserTrackLikeUncheckedCreateNestedManyWithoutTrackInput
     listenedByUsers?: UserTrackHistoryUncheckedCreateNestedManyWithoutTrackInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUncheckedCreateNestedManyWithoutTrackInput
@@ -21430,6 +23160,7 @@ export namespace Prisma {
     listenedByUsers?: UserTrackHistoryUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUpdateManyWithoutTrackNestedInput
     playlists?: PlaylistUpdateManyWithoutTracksNestedInput
+    folder?: FolderUpdateOneWithoutTracksNestedInput
   }
 
   export type TrackUncheckedUpdateWithoutLikedAsAudiobookByUsersInput = {
@@ -21448,6 +23179,7 @@ export namespace Prisma {
     episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
     artistId?: NullableIntFieldUpdateOperationsInput | number | null
     albumId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
     likedByUsers?: UserTrackLikeUncheckedUpdateManyWithoutTrackNestedInput
     listenedByUsers?: UserTrackHistoryUncheckedUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUncheckedUpdateManyWithoutTrackNestedInput
@@ -21505,6 +23237,7 @@ export namespace Prisma {
     listenedByUsers?: UserTrackHistoryCreateNestedManyWithoutTrackInput
     likedAsAudiobookByUsers?: UserAudiobookLikeCreateNestedManyWithoutTrackInput
     playlists?: PlaylistCreateNestedManyWithoutTracksInput
+    folder?: FolderCreateNestedOneWithoutTracksInput
   }
 
   export type TrackUncheckedCreateWithoutListenedAsAudiobookByUsersInput = {
@@ -21523,6 +23256,7 @@ export namespace Prisma {
     episodeNumber?: number | null
     artistId?: number | null
     albumId?: number | null
+    folderId?: number | null
     likedByUsers?: UserTrackLikeUncheckedCreateNestedManyWithoutTrackInput
     listenedByUsers?: UserTrackHistoryUncheckedCreateNestedManyWithoutTrackInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedCreateNestedManyWithoutTrackInput
@@ -21602,6 +23336,7 @@ export namespace Prisma {
     listenedByUsers?: UserTrackHistoryUpdateManyWithoutTrackNestedInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUpdateManyWithoutTrackNestedInput
     playlists?: PlaylistUpdateManyWithoutTracksNestedInput
+    folder?: FolderUpdateOneWithoutTracksNestedInput
   }
 
   export type TrackUncheckedUpdateWithoutListenedAsAudiobookByUsersInput = {
@@ -21620,6 +23355,7 @@ export namespace Prisma {
     episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
     artistId?: NullableIntFieldUpdateOperationsInput | number | null
     albumId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
     likedByUsers?: UserTrackLikeUncheckedUpdateManyWithoutTrackNestedInput
     listenedByUsers?: UserTrackHistoryUncheckedUpdateManyWithoutTrackNestedInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedUpdateManyWithoutTrackNestedInput
@@ -22113,6 +23849,7 @@ export namespace Prisma {
     listenedByUsers?: UserTrackHistoryCreateNestedManyWithoutTrackInput
     likedAsAudiobookByUsers?: UserAudiobookLikeCreateNestedManyWithoutTrackInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryCreateNestedManyWithoutTrackInput
+    folder?: FolderCreateNestedOneWithoutTracksInput
   }
 
   export type TrackUncheckedCreateWithoutPlaylistsInput = {
@@ -22131,6 +23868,7 @@ export namespace Prisma {
     episodeNumber?: number | null
     artistId?: number | null
     albumId?: number | null
+    folderId?: number | null
     likedByUsers?: UserTrackLikeUncheckedCreateNestedManyWithoutTrackInput
     listenedByUsers?: UserTrackHistoryUncheckedCreateNestedManyWithoutTrackInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedCreateNestedManyWithoutTrackInput
@@ -22194,6 +23932,179 @@ export namespace Prisma {
   export type TrackUpdateManyWithWhereWithoutPlaylistsInput = {
     where: TrackScalarWhereInput
     data: XOR<TrackUpdateManyMutationInput, TrackUncheckedUpdateManyWithoutPlaylistsInput>
+  }
+
+  export type FolderCreateWithoutChildrenInput = {
+    path: string
+    name: string
+    type?: $Enums.TrackType
+    parent?: FolderCreateNestedOneWithoutChildrenInput
+    tracks?: TrackCreateNestedManyWithoutFolderInput
+  }
+
+  export type FolderUncheckedCreateWithoutChildrenInput = {
+    id?: number
+    path: string
+    name: string
+    parentId?: number | null
+    type?: $Enums.TrackType
+    tracks?: TrackUncheckedCreateNestedManyWithoutFolderInput
+  }
+
+  export type FolderCreateOrConnectWithoutChildrenInput = {
+    where: FolderWhereUniqueInput
+    create: XOR<FolderCreateWithoutChildrenInput, FolderUncheckedCreateWithoutChildrenInput>
+  }
+
+  export type FolderCreateWithoutParentInput = {
+    path: string
+    name: string
+    type?: $Enums.TrackType
+    children?: FolderCreateNestedManyWithoutParentInput
+    tracks?: TrackCreateNestedManyWithoutFolderInput
+  }
+
+  export type FolderUncheckedCreateWithoutParentInput = {
+    id?: number
+    path: string
+    name: string
+    type?: $Enums.TrackType
+    children?: FolderUncheckedCreateNestedManyWithoutParentInput
+    tracks?: TrackUncheckedCreateNestedManyWithoutFolderInput
+  }
+
+  export type FolderCreateOrConnectWithoutParentInput = {
+    where: FolderWhereUniqueInput
+    create: XOR<FolderCreateWithoutParentInput, FolderUncheckedCreateWithoutParentInput>
+  }
+
+  export type FolderCreateManyParentInputEnvelope = {
+    data: FolderCreateManyParentInput | FolderCreateManyParentInput[]
+  }
+
+  export type TrackCreateWithoutFolderInput = {
+    name: string
+    path: string
+    artist: string
+    album: string
+    cover?: string | null
+    duration?: number | null
+    lyrics?: string | null
+    index?: number | null
+    type?: $Enums.TrackType
+    createdAt?: Date | string
+    fileModifiedAt?: Date | string | null
+    episodeNumber?: number | null
+    artistEntity?: ArtistCreateNestedOneWithoutTracksInput
+    albumEntity?: AlbumCreateNestedOneWithoutTracksInput
+    likedByUsers?: UserTrackLikeCreateNestedManyWithoutTrackInput
+    listenedByUsers?: UserTrackHistoryCreateNestedManyWithoutTrackInput
+    likedAsAudiobookByUsers?: UserAudiobookLikeCreateNestedManyWithoutTrackInput
+    listenedAsAudiobookByUsers?: UserAudiobookHistoryCreateNestedManyWithoutTrackInput
+    playlists?: PlaylistCreateNestedManyWithoutTracksInput
+  }
+
+  export type TrackUncheckedCreateWithoutFolderInput = {
+    id?: number
+    name: string
+    path: string
+    artist: string
+    album: string
+    cover?: string | null
+    duration?: number | null
+    lyrics?: string | null
+    index?: number | null
+    type?: $Enums.TrackType
+    createdAt?: Date | string
+    fileModifiedAt?: Date | string | null
+    episodeNumber?: number | null
+    artistId?: number | null
+    albumId?: number | null
+    likedByUsers?: UserTrackLikeUncheckedCreateNestedManyWithoutTrackInput
+    listenedByUsers?: UserTrackHistoryUncheckedCreateNestedManyWithoutTrackInput
+    likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedCreateNestedManyWithoutTrackInput
+    listenedAsAudiobookByUsers?: UserAudiobookHistoryUncheckedCreateNestedManyWithoutTrackInput
+    playlists?: PlaylistUncheckedCreateNestedManyWithoutTracksInput
+  }
+
+  export type TrackCreateOrConnectWithoutFolderInput = {
+    where: TrackWhereUniqueInput
+    create: XOR<TrackCreateWithoutFolderInput, TrackUncheckedCreateWithoutFolderInput>
+  }
+
+  export type TrackCreateManyFolderInputEnvelope = {
+    data: TrackCreateManyFolderInput | TrackCreateManyFolderInput[]
+  }
+
+  export type FolderUpsertWithoutChildrenInput = {
+    update: XOR<FolderUpdateWithoutChildrenInput, FolderUncheckedUpdateWithoutChildrenInput>
+    create: XOR<FolderCreateWithoutChildrenInput, FolderUncheckedCreateWithoutChildrenInput>
+    where?: FolderWhereInput
+  }
+
+  export type FolderUpdateToOneWithWhereWithoutChildrenInput = {
+    where?: FolderWhereInput
+    data: XOR<FolderUpdateWithoutChildrenInput, FolderUncheckedUpdateWithoutChildrenInput>
+  }
+
+  export type FolderUpdateWithoutChildrenInput = {
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    parent?: FolderUpdateOneWithoutChildrenNestedInput
+    tracks?: TrackUpdateManyWithoutFolderNestedInput
+  }
+
+  export type FolderUncheckedUpdateWithoutChildrenInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableIntFieldUpdateOperationsInput | number | null
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    tracks?: TrackUncheckedUpdateManyWithoutFolderNestedInput
+  }
+
+  export type FolderUpsertWithWhereUniqueWithoutParentInput = {
+    where: FolderWhereUniqueInput
+    update: XOR<FolderUpdateWithoutParentInput, FolderUncheckedUpdateWithoutParentInput>
+    create: XOR<FolderCreateWithoutParentInput, FolderUncheckedCreateWithoutParentInput>
+  }
+
+  export type FolderUpdateWithWhereUniqueWithoutParentInput = {
+    where: FolderWhereUniqueInput
+    data: XOR<FolderUpdateWithoutParentInput, FolderUncheckedUpdateWithoutParentInput>
+  }
+
+  export type FolderUpdateManyWithWhereWithoutParentInput = {
+    where: FolderScalarWhereInput
+    data: XOR<FolderUpdateManyMutationInput, FolderUncheckedUpdateManyWithoutParentInput>
+  }
+
+  export type FolderScalarWhereInput = {
+    AND?: FolderScalarWhereInput | FolderScalarWhereInput[]
+    OR?: FolderScalarWhereInput[]
+    NOT?: FolderScalarWhereInput | FolderScalarWhereInput[]
+    id?: IntFilter<"Folder"> | number
+    path?: StringFilter<"Folder"> | string
+    name?: StringFilter<"Folder"> | string
+    parentId?: IntNullableFilter<"Folder"> | number | null
+    type?: EnumTrackTypeFilter<"Folder"> | $Enums.TrackType
+  }
+
+  export type TrackUpsertWithWhereUniqueWithoutFolderInput = {
+    where: TrackWhereUniqueInput
+    update: XOR<TrackUpdateWithoutFolderInput, TrackUncheckedUpdateWithoutFolderInput>
+    create: XOR<TrackCreateWithoutFolderInput, TrackUncheckedCreateWithoutFolderInput>
+  }
+
+  export type TrackUpdateWithWhereUniqueWithoutFolderInput = {
+    where: TrackWhereUniqueInput
+    data: XOR<TrackUpdateWithoutFolderInput, TrackUncheckedUpdateWithoutFolderInput>
+  }
+
+  export type TrackUpdateManyWithWhereWithoutFolderInput = {
+    where: TrackScalarWhereInput
+    data: XOR<TrackUpdateManyMutationInput, TrackUncheckedUpdateManyWithoutFolderInput>
   }
 
   export type UserTrackLikeCreateManyTrackInput = {
@@ -22349,6 +24260,7 @@ export namespace Prisma {
     fileModifiedAt?: Date | string | null
     episodeNumber?: number | null
     artistId?: number | null
+    folderId?: number | null
   }
 
   export type UserAlbumLikeCreateManyAlbumInput = {
@@ -22382,6 +24294,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUpdateManyWithoutTrackNestedInput
     playlists?: PlaylistUpdateManyWithoutTracksNestedInput
+    folder?: FolderUpdateOneWithoutTracksNestedInput
   }
 
   export type TrackUncheckedUpdateWithoutAlbumEntityInput = {
@@ -22399,6 +24312,7 @@ export namespace Prisma {
     fileModifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
     artistId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
     likedByUsers?: UserTrackLikeUncheckedUpdateManyWithoutTrackNestedInput
     listenedByUsers?: UserTrackHistoryUncheckedUpdateManyWithoutTrackNestedInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedUpdateManyWithoutTrackNestedInput
@@ -22421,6 +24335,7 @@ export namespace Prisma {
     fileModifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
     artistId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type UserAlbumLikeUpdateWithoutAlbumInput = {
@@ -22472,6 +24387,7 @@ export namespace Prisma {
     fileModifiedAt?: Date | string | null
     episodeNumber?: number | null
     albumId?: number | null
+    folderId?: number | null
   }
 
   export type TrackUpdateWithoutArtistEntityInput = {
@@ -22493,6 +24409,7 @@ export namespace Prisma {
     likedAsAudiobookByUsers?: UserAudiobookLikeUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUpdateManyWithoutTrackNestedInput
     playlists?: PlaylistUpdateManyWithoutTracksNestedInput
+    folder?: FolderUpdateOneWithoutTracksNestedInput
   }
 
   export type TrackUncheckedUpdateWithoutArtistEntityInput = {
@@ -22510,6 +24427,7 @@ export namespace Prisma {
     fileModifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
     albumId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
     likedByUsers?: UserTrackLikeUncheckedUpdateManyWithoutTrackNestedInput
     listenedByUsers?: UserTrackHistoryUncheckedUpdateManyWithoutTrackNestedInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedUpdateManyWithoutTrackNestedInput
@@ -22532,6 +24450,7 @@ export namespace Prisma {
     fileModifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
     albumId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type UserTrackLikeCreateManyUserInput = {
@@ -22816,9 +24735,123 @@ export namespace Prisma {
     listenedByUsers?: UserTrackHistoryUpdateManyWithoutTrackNestedInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUpdateManyWithoutTrackNestedInput
+    folder?: FolderUpdateOneWithoutTracksNestedInput
   }
 
   export type TrackUncheckedUpdateWithoutPlaylistsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    path?: StringFieldUpdateOperationsInput | string
+    artist?: StringFieldUpdateOperationsInput | string
+    album?: StringFieldUpdateOperationsInput | string
+    cover?: NullableStringFieldUpdateOperationsInput | string | null
+    duration?: NullableIntFieldUpdateOperationsInput | number | null
+    lyrics?: NullableStringFieldUpdateOperationsInput | string | null
+    index?: NullableIntFieldUpdateOperationsInput | number | null
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fileModifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
+    artistId?: NullableIntFieldUpdateOperationsInput | number | null
+    albumId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
+    likedByUsers?: UserTrackLikeUncheckedUpdateManyWithoutTrackNestedInput
+    listenedByUsers?: UserTrackHistoryUncheckedUpdateManyWithoutTrackNestedInput
+    likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedUpdateManyWithoutTrackNestedInput
+    listenedAsAudiobookByUsers?: UserAudiobookHistoryUncheckedUpdateManyWithoutTrackNestedInput
+  }
+
+  export type TrackUncheckedUpdateManyWithoutPlaylistsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    path?: StringFieldUpdateOperationsInput | string
+    artist?: StringFieldUpdateOperationsInput | string
+    album?: StringFieldUpdateOperationsInput | string
+    cover?: NullableStringFieldUpdateOperationsInput | string | null
+    duration?: NullableIntFieldUpdateOperationsInput | number | null
+    lyrics?: NullableStringFieldUpdateOperationsInput | string | null
+    index?: NullableIntFieldUpdateOperationsInput | number | null
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fileModifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
+    artistId?: NullableIntFieldUpdateOperationsInput | number | null
+    albumId?: NullableIntFieldUpdateOperationsInput | number | null
+    folderId?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type FolderCreateManyParentInput = {
+    id?: number
+    path: string
+    name: string
+    type?: $Enums.TrackType
+  }
+
+  export type TrackCreateManyFolderInput = {
+    id?: number
+    name: string
+    path: string
+    artist: string
+    album: string
+    cover?: string | null
+    duration?: number | null
+    lyrics?: string | null
+    index?: number | null
+    type?: $Enums.TrackType
+    createdAt?: Date | string
+    fileModifiedAt?: Date | string | null
+    episodeNumber?: number | null
+    artistId?: number | null
+    albumId?: number | null
+  }
+
+  export type FolderUpdateWithoutParentInput = {
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    children?: FolderUpdateManyWithoutParentNestedInput
+    tracks?: TrackUpdateManyWithoutFolderNestedInput
+  }
+
+  export type FolderUncheckedUpdateWithoutParentInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    children?: FolderUncheckedUpdateManyWithoutParentNestedInput
+    tracks?: TrackUncheckedUpdateManyWithoutFolderNestedInput
+  }
+
+  export type FolderUncheckedUpdateManyWithoutParentInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    path?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+  }
+
+  export type TrackUpdateWithoutFolderInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    path?: StringFieldUpdateOperationsInput | string
+    artist?: StringFieldUpdateOperationsInput | string
+    album?: StringFieldUpdateOperationsInput | string
+    cover?: NullableStringFieldUpdateOperationsInput | string | null
+    duration?: NullableIntFieldUpdateOperationsInput | number | null
+    lyrics?: NullableStringFieldUpdateOperationsInput | string | null
+    index?: NullableIntFieldUpdateOperationsInput | number | null
+    type?: EnumTrackTypeFieldUpdateOperationsInput | $Enums.TrackType
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    fileModifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    episodeNumber?: NullableIntFieldUpdateOperationsInput | number | null
+    artistEntity?: ArtistUpdateOneWithoutTracksNestedInput
+    albumEntity?: AlbumUpdateOneWithoutTracksNestedInput
+    likedByUsers?: UserTrackLikeUpdateManyWithoutTrackNestedInput
+    listenedByUsers?: UserTrackHistoryUpdateManyWithoutTrackNestedInput
+    likedAsAudiobookByUsers?: UserAudiobookLikeUpdateManyWithoutTrackNestedInput
+    listenedAsAudiobookByUsers?: UserAudiobookHistoryUpdateManyWithoutTrackNestedInput
+    playlists?: PlaylistUpdateManyWithoutTracksNestedInput
+  }
+
+  export type TrackUncheckedUpdateWithoutFolderInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     path?: StringFieldUpdateOperationsInput | string
@@ -22838,9 +24871,10 @@ export namespace Prisma {
     listenedByUsers?: UserTrackHistoryUncheckedUpdateManyWithoutTrackNestedInput
     likedAsAudiobookByUsers?: UserAudiobookLikeUncheckedUpdateManyWithoutTrackNestedInput
     listenedAsAudiobookByUsers?: UserAudiobookHistoryUncheckedUpdateManyWithoutTrackNestedInput
+    playlists?: PlaylistUncheckedUpdateManyWithoutTracksNestedInput
   }
 
-  export type TrackUncheckedUpdateManyWithoutPlaylistsInput = {
+  export type TrackUncheckedUpdateManyWithoutFolderInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     path?: StringFieldUpdateOperationsInput | string

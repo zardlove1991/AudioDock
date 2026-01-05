@@ -44,6 +44,8 @@ model Track {
   likedAsAudiobookByUsers    UserAudiobookLike[]
   listenedAsAudiobookByUsers UserAudiobookHistory[]
   playlists                  Playlist[]
+  folderId                   Int?
+  folder                     Folder?                @relation(fields: [folderId], references: [id])
 }
 
 model Album {
@@ -197,4 +199,15 @@ model Playlist {
   userId Int
 
   tracks Track[]
+}
+
+model Folder {
+  id       Int       @id @default(autoincrement())
+  path     String    @unique // 文件夹的唯一路径
+  name     String
+  parentId Int? // 指向父文件夹
+  parent   Folder?   @relation("SubFolders", fields: [parentId], references: [id])
+  children Folder[]  @relation("SubFolders")
+  type     TrackType @default(MUSIC)
+  tracks   Track[]
 }

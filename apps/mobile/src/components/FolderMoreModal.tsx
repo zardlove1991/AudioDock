@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { deleteTrack } from "@soundx/services";
+import { deleteFolder, Folder } from "@soundx/services";
 import React from "react";
 import {
     Alert,
@@ -11,50 +11,53 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../context/ThemeContext";
-import { Track } from "../models";
 
-interface TrackMoreModalProps {
+interface FolderMoreModalProps {
   visible: boolean;
-  track: Track | null;
+  folder: Folder | null;
   onClose: () => void;
-  onAddToPlaylist: (track: Track) => void;
-  onShowProperties: (track: Track) => void;
-  onDeleteSuccess?: (trackId: number) => void;
+  onPlayAll: (folder: Folder) => void;
+  onShowProperties: (folder: Folder) => void;
+  onDeleteSuccess?: (folderId: number) => void;
 }
 
-export const TrackMoreModal: React.FC<TrackMoreModalProps> = ({
+export const FolderMoreModal: React.FC<FolderMoreModalProps> = ({
   visible,
-  track,
+  folder,
   onClose,
-  onAddToPlaylist,
+  onPlayAll,
   onShowProperties,
   onDeleteSuccess,
 }) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
-  if (!track) return null;
+  if (!folder) return null;
 
   const handleDelete = () => {
-    Alert.alert("删除歌曲", `确定要永久删除“${track.name}”吗？这将同时删除源文件。`, [
-      { text: "取消", style: "cancel" },
-      {
-        text: "确定删除",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            const res = await deleteTrack(track.id);
-            if (res.code === 200) {
-              onDeleteSuccess?.(track.id);
-              onClose();
+    Alert.alert(
+      "删除文件夹",
+      `确定要永久删除文件夹“${folder.name}”及其所有内容吗？这将同时从磁盘删除所有相关物理文件，此操作不可恢复。`,
+      [
+        { text: "取消", style: "cancel" },
+        {
+          text: "确定删除",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const res = await deleteFolder(folder.id);
+              if (res.code === 200) {
+                onDeleteSuccess?.(folder.id);
+                onClose();
+              }
+            } catch (e) {
+              console.error("Failed to delete folder", e);
+              Alert.alert("错误", "删除失败，请稍后重试");
             }
-          } catch (e) {
-            console.error("Failed to delete track", e);
-            Alert.alert("错误", "删除失败，请稍后重试");
-          }
+          },
         },
-      },
-    ]);
+      ]
+    );
   };
 
   return (
@@ -77,29 +80,29 @@ export const TrackMoreModal: React.FC<TrackMoreModalProps> = ({
           onStartShouldSetResponder={() => true}
         >
           <View style={styles.header}>
-            <Text style={[styles.trackName, { color: colors.text }]} numberOfLines={1}>
-              {track.name}
+            <Text style={[styles.folderName, { color: colors.text }]} numberOfLines={1}>
+              {folder.name}
             </Text>
-            <Text style={[styles.trackArtist, { color: colors.secondary }]} numberOfLines={1}>
-              {track.artist}
+            <Text style={[styles.folderPath, { color: colors.secondary }]} numberOfLines={1}>
+              {folder.path}
             </Text>
           </View>
 
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => {
-                onAddToPlaylist(track);
-                onClose();
+              onPlayAll(folder);
+              onClose();
             }}
           >
-            <Ionicons name="add-circle-outline" size={24} color={colors.text} />
-            <Text style={[styles.menuText, { color: colors.text }]}>添加到播放列表</Text>
+            <Ionicons name="play-circle-outline" size={24} color={colors.text} />
+            <Text style={[styles.menuText, { color: colors.text }]}>播放全部</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => {
-              onShowProperties(track);
+              onShowProperties(folder);
               onClose();
             }}
           >
@@ -112,7 +115,7 @@ export const TrackMoreModal: React.FC<TrackMoreModalProps> = ({
             onPress={handleDelete}
           >
             <Ionicons name="trash-outline" size={24} color="#ff4d4f" />
-            <Text style={[styles.menuText, styles.dangerText]}>删除歌曲</Text>
+            <Text style={[styles.menuText, styles.dangerText]}>删除文件夹</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -145,12 +148,12 @@ const styles = StyleSheet.create({
     borderBottomColor: "rgba(150,150,150,0.1)",
     paddingBottom: 15,
   },
-  trackName: {
+  folderName: {
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
   },
-  trackArtist: {
+  folderPath: {
     fontSize: 12,
     textAlign: "center",
     marginTop: 4,

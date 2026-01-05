@@ -5,14 +5,14 @@ import { getArtistList, loadMoreAlbum } from "@soundx/services";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  Image,
-  SectionList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
+    ActivityIndicator,
+    Image,
+    SectionList,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../src/context/ThemeContext";
@@ -318,6 +318,12 @@ export default function LibraryScreen() {
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>声仓</Text>
         <View style={styles.headerRight}>
+          <TouchableOpacity
+            onPress={() => router.push("/folder" as any)}
+            style={[styles.iconButton, { backgroundColor: colors.card, marginRight: 12 }]}
+          >
+            <Ionicons name="folder-outline" size={20} color={colors.primary} />
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => router.push("/search")}
             style={[styles.iconButton, { backgroundColor: colors.card }]}

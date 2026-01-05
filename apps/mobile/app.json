@@ -3,7 +3,7 @@
     "name": "AudioDock",
     "slug": "AudioDock 听见你的声音",
     "version": "1.0.40",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "../../images/logo.png",
     "scheme": "audiodock",
     "userInterfaceStyle": "automatic",

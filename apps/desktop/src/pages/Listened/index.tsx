@@ -5,6 +5,7 @@ import {
   SyncOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
+import { getAlbumHistory, getTrackHistory } from "@soundx/services";
 import { useInfiniteScroll } from "ahooks";
 import {
   Button,
@@ -22,7 +23,7 @@ import {
 import React, { useRef, useState } from "react";
 import Cover from "../../components/Cover/index";
 import type { Album, TimelineItem, Track } from "../../models";
-import { getAlbumHistory, getTrackHistory } from "@soundx/services";
+import { useAuthStore } from "../../store/auth";
 import { usePlayerStore } from "../../store/player";
 import { formatDuration } from "../../utils/formatDuration";
 import { usePlayMode } from "../../utils/playMode";
@@ -43,6 +44,7 @@ const Listened: React.FC = () => {
   const [viewMode, setViewMode] = useState<"album" | "track">("album");
   const { token } = theme.useToken();
   const { play, setPlaylist, currentTrack, isPlaying } = usePlayerStore();
+  const { user } = useAuthStore();
 
   const { mode } = usePlayMode();
   const type = mode;
@@ -59,7 +61,11 @@ const Listened: React.FC = () => {
           };
         }
         // Fetch real data from API
-        const response = await getAlbumHistory(currentLoadCount, 20);
+        const response = await getAlbumHistory(
+          user?.id || 0,
+          currentLoadCount,
+          20
+        );
 
         if (response.code === 200 && response.data) {
           const { list } = response.data;
@@ -95,7 +101,7 @@ const Listened: React.FC = () => {
         }
       } else {
         // Track mode
-        const res = await getTrackHistory(currentLoadCount, 20);
+        const res = await getTrackHistory(user?.id || 0, currentLoadCount, 20);
         if (res.code === 200 && res.data) {
           const { list, total: _total } = res.data;
 

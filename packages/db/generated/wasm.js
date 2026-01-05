@@ -132,7 +132,8 @@ exports.Prisma.TrackScalarFieldEnum = {
   fileModifiedAt: 'fileModifiedAt',
   episodeNumber: 'episodeNumber',
   artistId: 'artistId',
-  albumId: 'albumId'
+  albumId: 'albumId',
+  folderId: 'folderId'
 };
 
 exports.Prisma.AlbumScalarFieldEnum = {
@@ -223,6 +224,14 @@ exports.Prisma.PlaylistScalarFieldEnum = {
   userId: 'userId'
 };
 
+exports.Prisma.FolderScalarFieldEnum = {
+  id: 'id',
+  path: 'path',
+  name: 'name',
+  parentId: 'parentId',
+  type: 'type'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -249,7 +258,8 @@ exports.Prisma.ModelName = {
   UserAudiobookHistory: 'UserAudiobookHistory',
   User: 'User',
   Device: 'Device',
-  Playlist: 'Playlist'
+  Playlist: 'Playlist',
+  Folder: 'Folder'
 };
 
 /**

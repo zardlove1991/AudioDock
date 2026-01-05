@@ -5,6 +5,7 @@ import {
   SyncOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
+import { getFavoriteAlbums, getFavoriteTracks } from "@soundx/services";
 import { useInfiniteScroll } from "ahooks";
 import {
   Button,
@@ -23,7 +24,7 @@ import React, { useRef, useState } from "react";
 import Cover from "../../components/Cover/index";
 import type { TimelineItem } from "../../models";
 import { type Album, type Track } from "../../models";
-import { getFavoriteAlbums, getFavoriteTracks } from "@soundx/services";
+import { useAuthStore } from "../../store/auth";
 import { usePlayerStore } from "../../store/player";
 import { formatDuration } from "../../utils/formatDuration";
 import { usePlayMode } from "../../utils/playMode";
@@ -45,6 +46,8 @@ const Favorites: React.FC = () => {
   const { token } = theme.useToken();
   const { play, setPlaylist, currentTrack, isPlaying } = usePlayerStore();
 
+    const { user } = useAuthStore();
+
   const { mode } = usePlayMode();
   const type = mode;
 
@@ -53,7 +56,7 @@ const Favorites: React.FC = () => {
 
     try {
       if (viewMode === "album") {
-        const res = await getFavoriteAlbums(currentLoadCount, 20);
+        const res = await getFavoriteAlbums(user?.id || 0, currentLoadCount, 20);
         if (res.code === 200 && res.data) {
           const { list } = res.data;
 
@@ -103,7 +106,7 @@ const Favorites: React.FC = () => {
         }
       } else {
         // Track mode
-        const res = await getFavoriteTracks(currentLoadCount, 20);
+        const res = await getFavoriteTracks(user?.id || 0, currentLoadCount, 20);
         if (res.code === 200 && res.data) {
           const { list, total: _total } = res.data;
 

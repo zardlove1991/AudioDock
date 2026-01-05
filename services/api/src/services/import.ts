@@ -89,6 +89,7 @@ export class ImportService {
     await this.prisma.track.deleteMany();
     await this.prisma.album.deleteMany();
     await this.prisma.artist.deleteMany();
+    await this.prisma.folder.deleteMany();
 
     this.logger.log('Full library cleanup completed.');
   }
@@ -162,7 +163,10 @@ export class ImportService {
             });
           }
 
-          // 3. Create Track
+          // 3. Handle Folder
+          const folderId = await this.getOrCreateFolderHierarchically(path.dirname(item.path), audioBasePath, type);
+
+          // 4. Create Track
           const newTrack = await this.trackService.createTrack({
             name: item.title || path.basename(item.path),
             artist: artistName,
@@ -178,6 +182,7 @@ export class ImportService {
             episodeNumber: extractEpisodeNumber(item.title || ""),
             artistId: artist.id,
             albumId: album.id,
+            folderId: folderId,
           });
           trackId = newTrack.id;
         }
@@ -205,6 +210,32 @@ export class ImportService {
       task.status = TaskStatus.FAILED;
       task.message = error instanceof Error ? error.message : String(error);
     }
+  }
+
+  private async getOrCreateFolderHierarchically(localPath: string, basePath: string, type: TrackType): Promise<number | null> {
+    const relativePath = path.relative(basePath, localPath);
+    if (relativePath === '' || relativePath === '.') return null;
+
+    const parts = relativePath.split(path.sep);
+    let parentId: number | null = null;
+    let currentPath = basePath;
+
+    for (const part of parts) {
+      currentPath = path.join(currentPath, part);
+      const folderRecord = await this.prisma.folder.upsert({
+        where: { path: currentPath },
+        update: {},
+        create: {
+          path: currentPath,
+          name: part,
+          parentId: parentId,
+          type: type,
+        },
+      });
+      parentId = folderRecord.id;
+    }
+
+    return parentId;
   }
 }
 

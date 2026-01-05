@@ -27,13 +27,14 @@ function RootLayoutNav() {
 
     // 排除 artist / album / modal 页面
     const isDetailPage =
-      segments[0] === "artist" ||
-      segments[0] === "album" ||
-      segments[0] === "modal" ||
-      segments[0] === "player" ||
-      segments[0] === "search" ||
-      segments[0] === "settings" ||
-      segments[0] === "playlist";
+      (segments[0] as string) === "artist" ||
+      (segments[0] as string) === "album" ||
+      (segments[0] as string) === "modal" ||
+      (segments[0] as string) === "player" ||
+      (segments[0] as string) === "search" ||
+      (segments[0] as string) === "settings" ||
+      (segments[0] as string) === "playlist" ||
+      (segments[0] as string) === "folder";
 
     if (!token && inAuthGroup) {
       router.replace("/login");
@@ -43,47 +44,47 @@ function RootLayoutNav() {
   }, [token, segments, isLoading]);
 
   return (
-    <PlayModeProvider>
-      <PlayerProvider>
-        <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="modal"
-              options={{
-                headerShown: false,
-                animation: "slide_from_right",
-              }}
-            />
-            <Stack.Screen
-              name="player"
-              options={{
-                presentation: "fullScreenModal",
-                headerShown: false,
-                animation: "slide_from_bottom",
-              }}
-            />
-            <Stack.Screen
-              name="search"
-              options={{
-                headerShown: false,
-                animation: "fade",
-              }}
-            />
-            <Stack.Screen
-              name="settings"
-              options={{
-                headerShown: false,
-                animation: "slide_from_right",
-              }}
-            />
-            <Stack.Screen name="playlist/[id]" options={{ headerShown: false }} />
-            <Stack.Screen name="album/[id]" options={{ headerShown: false }} />
-            <Stack.Screen name="artist/[id]" options={{ headerShown: false }} />
-          </Stack>
-          {segments[0] !== "player" && <PlaylistModal />}
-        </PlayerProvider>
-      </PlayModeProvider>
+    <>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="modal"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen
+          name="player"
+          options={{
+            presentation: "fullScreenModal",
+            headerShown: false,
+            animation: "slide_from_bottom",
+          }}
+        />
+        <Stack.Screen
+          name="search"
+          options={{
+            headerShown: false,
+            animation: "fade",
+          }}
+        />
+        <Stack.Screen
+          name="settings"
+          options={{
+            headerShown: false,
+            animation: "slide_from_right",
+          }}
+        />
+        <Stack.Screen name="playlist/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="album/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="artist/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="folder/index" options={{ headerShown: false }} />
+        <Stack.Screen name="folder/[id]" options={{ headerShown: false }} />
+      </Stack>
+      {(segments[0] as string) !== "player" && <PlaylistModal />}
+    </>
   );
 }
 
@@ -100,8 +101,12 @@ export default function RootLayout() {
           <SettingsProvider>
             <NotificationProvider>
               <SyncProvider>
-                <RootLayoutNav />
-                <PlaybackNotification />
+                <PlayModeProvider>
+                  <PlayerProvider>
+                    <RootLayoutNav />
+                    <PlaybackNotification />
+                  </PlayerProvider>
+                </PlayModeProvider>
               </SyncProvider>
             </NotificationProvider>
           </SettingsProvider>

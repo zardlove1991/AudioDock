@@ -4,6 +4,7 @@ import {
   MoreOutlined,
   PlayCircleOutlined,
 } from "@ant-design/icons";
+import { getAlbumById, getAlbumTracks, toggleAlbumLike, unlikeAlbum } from "@soundx/services";
 import type { MenuProps } from "antd";
 import { Dropdown, Skeleton, theme, Typography } from "antd";
 import React, { useEffect, useState } from "react";
@@ -11,8 +12,6 @@ import { useNavigate } from "react-router-dom";
 import { useMessage } from "../../context/MessageContext";
 import { getBaseURL } from "../../https";
 import type { Album, Track } from "../../models";
-import { getAlbumById, getAlbumTracks } from "@soundx/services";
-import { toggleAlbumLike, unlikeAlbum } from "@soundx/services";
 import { useAuthStore } from "../../store/auth";
 import { usePlayerStore } from "../../store/player";
 import styles from "./index.module.less";
@@ -106,13 +105,13 @@ const Cover: CoverComponent = ({ item, size, isTrack = false }) => {
 
     try {
       if (isLiked) {
-        const res = await unlikeAlbum((item as Album).id);
+        const res = await unlikeAlbum((item as Album).id, user?.id || 0);
         if (res.code === 200) {
           setIsLiked(false);
           message.success("已取消收藏");
         }
       } else {
-        const res = await toggleAlbumLike((item as Album).id);
+        const res = await toggleAlbumLike((item as Album).id, user?.id || 0);
         if (res.code === 200) {
           setIsLiked(true);
           message.success("收藏成功");

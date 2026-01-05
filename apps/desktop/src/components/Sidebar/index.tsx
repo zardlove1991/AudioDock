@@ -2,20 +2,21 @@ import {
     AppstoreOutlined,
     CompassOutlined,
     CustomerServiceOutlined,
+    FolderOutlined,
     HeartOutlined,
     PlusOutlined,
     SoundOutlined,
     TeamOutlined,
 } from "@ant-design/icons";
-import { Form, Input, Modal, theme, Typography } from "antd";
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useMessage } from "../../context/MessageContext";
 import {
     createPlaylist,
     getPlaylists,
     type Playlist,
 } from "@soundx/services";
+import { Form, Input, Modal, theme, Typography } from "antd";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useMessage } from "../../context/MessageContext";
 import { useAuthStore } from "../../store/auth";
 import { usePlayMode } from "../../utils/playMode";
 import styles from "./index.module.less";
@@ -105,6 +106,12 @@ const Sidebar: React.FC = () => {
           text="艺术家"
           onClick={() => navigate("/artists")}
           active={isActive("/artists")}
+        />
+        <MenuItem
+          icon={<FolderOutlined />}
+          text="文件夹"
+          onClick={() => navigate("/folders")}
+          active={isActive("/folders")}
         />
       </div>
 

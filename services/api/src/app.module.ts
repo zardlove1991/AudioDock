@@ -11,6 +11,7 @@ import jwtConfig from './config/jwt.config';
 import { AlbumController } from './controllers/album';
 import { ArtistController } from './controllers/artist';
 import { AudiobookController } from './controllers/audiobook';
+import { FolderController } from './controllers/folder';
 import { ImportController } from './controllers/import';
 import { PlaylistController } from './controllers/playlist';
 import { TrackController } from './controllers/track';
@@ -26,6 +27,7 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { AlbumService } from './services/album';
 import { ArtistService } from './services/artist';
 import { AudiobookService } from './services/audiobook';
+import { FolderService } from './services/folder';
 import { ImportService } from './services/import';
 import { PlaylistService } from './services/playlist';
 import { TrackService } from './services/track';
@@ -78,6 +80,7 @@ import { UserTrackLikeService } from './services/user-track-like';
     AudiobookController,
     ImportController,
     PlaylistController,
+    FolderController,
   ],
   providers: [
     UserService,
@@ -102,6 +105,7 @@ import { UserTrackLikeService } from './services/user-track-like';
     },
     AudiobookService,
     PlaylistService,
+    FolderService,
     SyncGateway,
   ],
 })

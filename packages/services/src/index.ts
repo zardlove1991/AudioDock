@@ -1,6 +1,7 @@
 export * from "./album";
 export * from "./artist";
 export * from "./auth";
+export * from "./folder";
 export * from "./import";
 export * from "./models";
 export * from "./playlist";
