@@ -1,13 +1,24 @@
+import { useAuth } from "@/src/context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import { BottomTabBar } from "@react-navigation/bottom-tabs";
+import { check } from "@soundx/services";
 import { Tabs } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import { Platform, View } from "react-native";
 import { MiniPlayer } from "../../src/components/MiniPlayer";
 import { useTheme } from "../../src/context/ThemeContext";
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const { logout } = useAuth();
+
+  useEffect(() => {
+    check().then(res => {
+      if (res.code === 401) {
+        logout();
+      }
+    })
+  }, [])
 
   return (
     <Tabs

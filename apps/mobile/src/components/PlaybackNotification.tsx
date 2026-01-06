@@ -106,10 +106,9 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     top: 0,
-    left: 12,
     right: 12,
-    maxWidth: 450,
-    alignSelf: 'center',
+    maxWidth: 350,
+    alignSelf: 'flex-end',
     width: '100%',
     zIndex: 10000,
   },

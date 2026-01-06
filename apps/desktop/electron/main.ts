@@ -234,6 +234,8 @@ function createMiniPlayerWindow() {
       skipTaskbar: true,
       hasShadow: false,
       transparent: true,
+      vibrancy: "popover",
+      visualEffectState: "active",
       webPreferences: {
          contextIsolation: true,
          nodeIntegration: false,

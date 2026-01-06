@@ -3,13 +3,14 @@ import { batchDeleteItems, Folder as FolderType, getFolderContents, getFolderRoo
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FolderMoreModal } from "../../src/components/FolderMoreModal";
@@ -19,6 +20,7 @@ import { usePlayMode } from "../../src/utils/playMode";
 
 export default function FolderRootsScreen() {
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { mode } = usePlayMode();
@@ -33,6 +35,14 @@ export default function FolderRootsScreen() {
   // Selection state
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedFolders, setSelectedFolders] = useState<number[]>([]);
+
+  // Adaptive Grid Calculation
+  const GRID_ITEM_WIDTH = 100;
+  const GRID_GAP = 12;
+  const PADDING_H = 32; // 16 * 2
+  
+  const numColumns = Math.max(3, Math.floor((width - PADDING_H + GRID_GAP) / (GRID_ITEM_WIDTH + GRID_GAP)));
+  const itemWidth = (width - PADDING_H - (numColumns - 1) * GRID_GAP) / numColumns;
 
   const fetchRoots = async () => {
     setLoading(true);
@@ -140,6 +150,7 @@ export default function FolderRootsScreen() {
         <TouchableOpacity
           style={[
             styles.gridItem, 
+            { width: itemWidth },
             { backgroundColor: colors.card },
             isSelected && { backgroundColor: colors.primary + "20", borderColor: colors.primary, borderWidth: 1 }
           ]}
@@ -259,8 +270,8 @@ export default function FolderRootsScreen() {
         </View>
       ) : (
         <FlatList
-          key={layoutMode}
-          numColumns={layoutMode === "grid" ? 3 : 1}
+          key={layoutMode + numColumns}
+          numColumns={layoutMode === "grid" ? numColumns : 1}
           data={folders}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
@@ -363,7 +374,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   gridItem: {
-    width: "31%",
+    // width is now set dynamically via style prop
     aspectRatio: 0.8,
     padding: 8,
     borderRadius: 12,

@@ -86,6 +86,10 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
   const initialAudiobookState = loadModeState(TrackType.AUDIOBOOK);
 
   const activeState = initialMode === TrackType.AUDIOBOOK ? initialAudiobookState : initialMusicState;
+  
+  // Load global settings
+  const storedPlayMode = localStorage.getItem("playOrder") as "sequence" | "loop" | "shuffle" | "single" || "sequence";
+  const storedVolume = Number(localStorage.getItem("playerVolume")) || 70;
 
   // Progress Reporting Helper
   let lastReportTime = 0;
@@ -126,8 +130,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     ...activeState,
 
     isPlaying: false,
-    playMode: "sequence",
-    volume: 70,
+    playMode: storedPlayMode,
+    volume: storedVolume,
     activeMode: initialMode,
 
     modes: {

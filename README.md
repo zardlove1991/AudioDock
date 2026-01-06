@@ -33,7 +33,7 @@ AudioDock（声仓） 是一个基于现代 Web 技术构建的音乐和有声�
 ## 下载
 最新版本看这里：
 - **[web端和服务端](https://github.com/mmdctjj?tab=packages&repo_name=AudioDock)**：找到每个包最新的下载命令 docker 下载即可
-- **[桌面端](https://github.com/mmdctjj/AudioDock/releases)**：下载对应平台的版本
+- **[桌面端、移动端](https://github.com/mmdctjj/AudioDock/releases)**：下载对应平台的版本
 
 ## 开发进度
 

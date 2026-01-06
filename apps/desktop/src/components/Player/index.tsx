@@ -136,12 +136,32 @@ const Player: React.FC = () => {
   // Sleep Timer State
   const [sleepTimerMode, setSleepTimerMode] = useState<
     "off" | "time" | "count" | "current"
-  >("off");
+  >(() => {
+    const saved = localStorage.getItem("sleepTimerMode");
+    return (saved as "off" | "time" | "count" | "current") || "off";
+  });
   const [sleepTimerEndTime, setSleepTimerEndTime] = useState<number | null>(
-    null
+    () => {
+      const saved = localStorage.getItem("sleepTimerEndTime");
+      const time = saved ? Number(saved) : null;
+      // If time passed while closed, user will see immediate trigger or we can handle in effect
+      return time;
+    }
   ); // Timestamp
-  const [sleepTimerCount, setSleepTimerCount] = useState<number>(0); // Remaining episodes
-  const [timerDuration, setTimerDuration] = useState<number>(0); // Store the minutes set by slider for UI display
+  const [sleepTimerCount, setSleepTimerCount] = useState<number>(() => {
+    const saved = localStorage.getItem("sleepTimerCount");
+    return saved ? Number(saved) : 0;
+  }); // Remaining episodes
+  const [timerDuration, setTimerDuration] = useState<number>(() => {
+    const savedEndTime = localStorage.getItem("sleepTimerEndTime");
+    if (savedEndTime) {
+      const remaining = Number(savedEndTime) - Date.now();
+      if (remaining > 0) {
+        return Math.floor(remaining / 60000);
+      }
+    }
+    return 0;
+  }); // Store the minutes set by slider for UI display
 
   const [isTimerModalOpen, setIsTimerModalOpen] = useState(false);
   const [timerMinutes, setTimerMinutes] = useState(30);
@@ -633,14 +653,34 @@ const Player: React.FC = () => {
           setSleepTimerEndTime(null);
           message.success("定时关闭已触发");
           setDuration(0);
+          localStorage.removeItem("sleepTimerEndTime");
+          localStorage.setItem("sleepTimerMode", "off");
         } else {
-          setSleepTimerEndTime(sleepTimerEndTime - 1000);
+          // Just update UI or check
+          // setSleepTimerEndTime(sleepTimerEndTime - 1000); // Don't decrement timestamp, it's absolute
         }
       }, 1000);
     }
 
     return () => clearInterval(interval);
   }, [sleepTimerMode, sleepTimerEndTime, pause, message]);
+
+  // Persist Sleep Timer State
+  useEffect(() => {
+    localStorage.setItem("sleepTimerMode", sleepTimerMode);
+  }, [sleepTimerMode]);
+
+  useEffect(() => {
+    if (sleepTimerEndTime) {
+      localStorage.setItem("sleepTimerEndTime", String(sleepTimerEndTime));
+    } else {
+      localStorage.removeItem("sleepTimerEndTime");
+    }
+  }, [sleepTimerEndTime]);
+
+  useEffect(() => {
+    localStorage.setItem("sleepTimerCount", String(sleepTimerCount));
+  }, [sleepTimerCount]);
 
   const handleEnded = () => {
     // Sleep Timer Logic
@@ -661,6 +701,15 @@ const Player: React.FC = () => {
       } else {
         setSleepTimerCount((prev) => prev - 1);
       }
+    }
+
+    if (playMode === "single") {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+        setCurrentTime(0);
+      }
+      return;
     }
 
     next();

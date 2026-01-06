@@ -16,3 +16,8 @@ export const register = (user: Partial<User> & { deviceName?: string }) => {
     { ...userData, deviceName }
   );
 };
+
+export const check = () => {
+  return request.get<any, ISuccessResponse<boolean>>("/auth/check");
+};
+

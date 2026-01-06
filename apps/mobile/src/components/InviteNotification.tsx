@@ -99,10 +99,9 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     top: 0,
-    left: 20,
-    right: 20,
-    maxWidth: 450,
-    alignSelf: 'center',
+    right: 12,
+    maxWidth: 350,
+    alignSelf: 'flex-end',
     width: '100%',
     zIndex: 9999,
   },

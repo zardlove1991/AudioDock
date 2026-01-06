@@ -16,21 +16,20 @@ import {
   SkinOutlined,
   SunOutlined
 } from "@ant-design/icons";
+import {
+  check,
+  createImportTask,
+  getImportTask,
+  searchAll,
+  TaskStatus,
+  type SearchResults as SearchResultsType,
+} from "@soundx/services";
 import { Flex, Input, Modal, Popover, theme, Tooltip } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMessage } from "../../context/MessageContext";
 import { useTheme } from "../../context/ThemeContext";
 import { TrackType } from "../../models";
-import {
-  createImportTask,
-  getImportTask,
-  TaskStatus,
-} from "@soundx/services";
-import {
-  searchAll,
-  type SearchResults as SearchResultsType,
-} from "@soundx/services";
 import { useAuthStore } from "../../store/auth";
 import { isWindows } from "../../utils/platform";
 import { usePlayMode } from "../../utils/playMode";
@@ -180,6 +179,15 @@ const Header: React.FC = () => {
 
   // Click outside to close search results
   useEffect(() => {
+
+    check().then(res => {
+      if (res.code == 200) {
+        
+      } else if (res.code === 401) {
+        message.error("登录信息已过期，请重新登录");
+        logout();
+      }
+    })
     const handleClickOutside = (event: MouseEvent) => {
       if (
         searchContainerRef.current &&

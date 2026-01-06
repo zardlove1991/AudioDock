@@ -1,22 +1,23 @@
 import { Ionicons } from "@expo/vector-icons";
 import {
-  batchDeleteItems,
-  Folder,
-  getFolderContents,
-  getFolderStats
+    batchDeleteItems,
+    Folder,
+    getFolderContents,
+    getFolderStats
 } from "@soundx/services";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    useWindowDimensions,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AddToPlaylistModal } from "../../src/components/AddToPlaylistModal";
@@ -30,6 +31,7 @@ import { Track } from "../../src/models";
 export default function FolderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
+  const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { playTrack, playTrackList } = usePlayer();
@@ -54,6 +56,14 @@ export default function FolderDetailScreen() {
 
   // Layout mode
   const [layoutMode, setLayoutMode] = useState<"list" | "grid">("list");
+  
+  // Adaptive Grid Calculation
+  const GRID_ITEM_WIDTH = 100;
+  const GRID_GAP = 12;
+  const PADDING_H = 32; // 16 * 2
+  
+  const numColumns = Math.max(3, Math.floor((width - PADDING_H + GRID_GAP) / (GRID_ITEM_WIDTH + GRID_GAP)));
+  const itemWidth = (width - PADDING_H - (numColumns - 1) * GRID_GAP) / numColumns;
 
   const fetchData = async () => {
     setLoading(true);
@@ -199,6 +209,7 @@ export default function FolderDetailScreen() {
         <TouchableOpacity
           style={[
             styles.gridItem,
+            { width: itemWidth },
             { backgroundColor: colors.card },
             isSelected && { backgroundColor: colors.primary + "20", borderColor: colors.primary, borderWidth: 1 }
           ]}
@@ -377,8 +388,8 @@ export default function FolderDetailScreen() {
         </View>
       ) : (
         <FlatList
-          key={layoutMode}
-          numColumns={layoutMode === "grid" ? 3 : 1}
+          key={layoutMode + numColumns}
+          numColumns={layoutMode === "grid" ? numColumns : 1}
           data={[...(data?.children || []), ...(data?.tracks || [])]}
           renderItem={renderItem}
           keyExtractor={(item, index) => `${"tracks" in item ? "folder" : "track"}-${item.id}`}
@@ -539,7 +550,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   gridItem: {
-    width: "31%", // Approx for 3 columns
+    // width is now set dynamically via style prop
     aspectRatio: 0.8,
     padding: 8,
     borderRadius: 12,

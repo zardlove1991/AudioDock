@@ -1,4 +1,6 @@
+import { setRequestInstance } from "@soundx/services";
 import axios, { AxiosError, type AxiosResponse } from "axios";
+import { useAuthStore } from "../store/auth";
 
 // Get base URL based on environment
 export function getBaseURL(): string {
@@ -63,7 +65,7 @@ instance.interceptors.response.use(
     // HTTP 状态码
     const status = error.response?.status ?? 0;
     if (status === 401) {
-      localStorage.removeItem("auth-storage");
+      useAuthStore().logout();
     }
     // message.error(messageContent[status]);
     // Note: message.error cannot be used here as it's outside React context
@@ -72,8 +74,6 @@ instance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-import { setRequestInstance } from "@soundx/services";
 
 setRequestInstance(instance);
 

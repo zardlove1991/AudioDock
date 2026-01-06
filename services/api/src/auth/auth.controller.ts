@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { Device, User } from '@soundx/db';
 import { IErrorResponse, IParamsErrorResponse, ISuccessResponse } from 'src/common/const';
 import { Public } from '../common/public.decorator';
@@ -81,5 +81,14 @@ export class AuthController {
         message: error.message || '注册失败',
       };
     }
+  }
+
+  @Get('/auth/check')
+  async check(): Promise<ISuccessResponse<boolean>> {
+    return {
+      code: 200,
+      message: 'success',
+      data: true,
+    };
   }
 }
