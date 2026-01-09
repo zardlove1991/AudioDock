@@ -34,6 +34,27 @@ export class AlbumService {
     return await this.prisma.album.findMany({ where: { artist } });
   }
 
+  async getCollaborativeAlbumsByArtist(artistName: string): Promise<Album[]> {
+    // 1. Fetch albums where the artist field contains the artistName but is not an exact match
+    const candidates = await this.prisma.album.findMany({
+      where: {
+        artist: {
+          contains: artistName,
+          not: artistName,
+        },
+      },
+      orderBy: { id: 'desc' },
+    });
+
+    // 2. Filter in memory to ensure it's a valid collaboration split by delimiters
+    const delimiters = /[&/、, \s]+/; 
+    return candidates.filter(album => {
+      const artists = album.artist.split(delimiters).map(a => a.trim());
+      // Check for exact match within the split artists
+      return artists.includes(artistName);
+    });
+  }
+
   async getAlbumById(id: number, userId?: number): Promise<Album | null> {
     const album = await this.prisma.album.findUnique({ where: { id }, include: { likedByUsers: true, listenedByUsers: true } });
     if (!album) return null;

@@ -1,22 +1,22 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Logger,
-  Param,
-  Post,
-  Put,
-  Query,
-  Req,
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Logger,
+    Param,
+    Post,
+    Put,
+    Query,
+    Req,
 } from '@nestjs/common';
 import { Album, TrackType } from '@soundx/db';
 import { Request } from 'express';
 import {
-  IErrorResponse,
-  ILoadMoreData,
-  ISuccessResponse,
-  ITableData,
+    IErrorResponse,
+    ILoadMoreData,
+    ISuccessResponse,
+    ITableData,
 } from 'src/common/const';
 import { LogMethod } from '../common/log-method.decorator';
 import { AlbumService } from '../services/album';
@@ -50,6 +50,26 @@ export class AlbumController {
 
 
 
+
+  @Get('/album/collaborative/:artist')
+  @LogMethod()
+  async getCollaborativeAlbumsByArtist(
+    @Param('artist') artist: string,
+  ): Promise<ISuccessResponse<Album[]> | IErrorResponse> {
+    try {
+      const albumList = await this.albumService.getCollaborativeAlbumsByArtist(artist);
+      return {
+        code: 200,
+        message: 'success',
+        data: albumList,
+      };
+    } catch (error) {
+      return {
+        code: 500,
+        message: error,
+      };
+    }
+  }
 
   @Get('/album/artist/:artist')
   @LogMethod()

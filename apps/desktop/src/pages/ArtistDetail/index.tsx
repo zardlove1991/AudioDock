@@ -1,13 +1,14 @@
 import { PauseCircleFilled, PlayCircleFilled } from "@ant-design/icons";
+import { getAlbumsByArtist, getArtistById, getCollaborativeAlbumsByArtist, getTracksByArtist } from "@soundx/services";
 import {
-  Avatar,
-  Col,
-  Empty,
-  Flex,
-  Row,
-  Skeleton,
-  Table,
-  Typography,
+    Avatar,
+    Col,
+    Empty,
+    Flex,
+    Row,
+    Skeleton,
+    Table,
+    Typography,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -16,9 +17,6 @@ import PlayingIndicator from "../../components/PlayingIndicator";
 import { useMessage } from "../../context/MessageContext";
 import { getBaseURL } from "../../https";
 import { type Album, type Artist, type Track, TrackType } from "../../models";
-import { getAlbumsByArtist } from "@soundx/services";
-import { getArtistById } from "@soundx/services";
-import { getTracksByArtist } from "@soundx/services";
 import { usePlayerStore } from "../../store/player";
 import { getCoverUrl } from "../../utils";
 import { formatDuration } from "../../utils/formatDuration";
@@ -32,6 +30,7 @@ const ArtistDetail: React.FC = () => {
   const message = useMessage();
   const [artist, setArtist] = useState<Artist | null>(null);
   const [albums, setAlbums] = useState<Album[]>([]);
+  const [collaborativeAlbums, setCollaborativeAlbums] = useState<Album[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
   const { mode } = usePlayMode();
@@ -47,12 +46,18 @@ const ArtistDetail: React.FC = () => {
         if (artistRes.code === 200 && artistRes.data) {
           setArtist(artistRes.data);
           // Fetch albums using artist name
-          const albumsRes = await getAlbumsByArtist(artistRes.data.name);
+          const [albumsRes, collaborativeRes, tracksRes] = await Promise.all([
+            getAlbumsByArtist(artistRes.data.name),
+            getCollaborativeAlbumsByArtist(artistRes.data.name),
+            getTracksByArtist(artistRes.data.name),
+          ]);
+
           if (albumsRes.code === 200 && albumsRes.data) {
             setAlbums(albumsRes.data);
           }
-          // Fetch tracks using artist name
-          const tracksRes = await getTracksByArtist(artistRes.data.name);
+          if (collaborativeRes.code === 200 && collaborativeRes.data) {
+            setCollaborativeAlbums(collaborativeRes.data);
+          }
           if (tracksRes.code === 200 && tracksRes.data) {
             setTracks(tracksRes.data);
           }
@@ -153,6 +158,21 @@ const ArtistDetail: React.FC = () => {
         </Row>
         {albums.length === 0 && <Empty description="暂无专辑" />}
       </div>
+
+      {collaborativeAlbums.length > 0 && (
+        <div className={styles.content} style={{ marginTop: "48px" }}>
+          <Title level={4} className={styles.sectionTitle}>
+            合作专辑 ({collaborativeAlbums.length})
+          </Title>
+          <Row gutter={[24, 24]}>
+            {collaborativeAlbums.map((album) => (
+              <Col key={album.id}>
+                <Cover item={album} />
+              </Col>
+            ))}
+          </Row>
+        </div>
+      )}
 
       {mode === TrackType.MUSIC && (
         <div style={{ marginTop: "48px" }}>

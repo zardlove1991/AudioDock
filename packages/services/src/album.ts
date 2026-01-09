@@ -1,10 +1,10 @@
-import request from "./request";
 import type {
-  Album,
-  ILoadMoreData,
-  ISuccessResponse,
-  ITableData,
+    Album,
+    ILoadMoreData,
+    ISuccessResponse,
+    ITableData,
 } from "./models";
+import request from "./request";
 
 export const getAlbumList = () => {
   return request.get<any, ISuccessResponse<Album[]>>("/album/list");
@@ -95,4 +95,8 @@ export const getAlbumTracks = (
 
 export const getAlbumsByArtist = (artist: string) => {
   return request.get<any, ISuccessResponse<Album[]>>(`/album/artist/${artist}`);
+};
+
+export const getCollaborativeAlbumsByArtist = (artist: string) => {
+  return request.get<any, ISuccessResponse<Album[]>>(`/album/collaborative/${artist}`);
 };

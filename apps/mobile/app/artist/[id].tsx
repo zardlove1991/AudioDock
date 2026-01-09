@@ -7,7 +7,7 @@ import { getBaseURL } from "@/src/https";
 import { Album, Artist, Track, TrackType } from "@/src/models";
 import { usePlayMode } from "@/src/utils/playMode";
 import { Ionicons } from "@expo/vector-icons";
-import { getAlbumsByArtist, getArtistById, getTracksByArtist } from "@soundx/services";
+import { getAlbumsByArtist, getArtistById, getCollaborativeAlbumsByArtist, getTracksByArtist } from "@soundx/services";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -28,6 +28,7 @@ export default function ArtistDetailScreen() {
   const router = useRouter();
   const [artist, setArtist] = useState<Artist | null>(null);
   const [albums, setAlbums] = useState<Album[]>([]);
+  const [collaborativeAlbums, setCollaborativeAlbums] = useState<Album[]>([]);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
@@ -49,11 +50,13 @@ export default function ArtistDetailScreen() {
         setArtist(artistRes.data);
         // Fetch albums and tracks using the artist name
         if (artistRes.data.name) {
-          const [albumsRes, tracksRes] = await Promise.all([
+          const [albumsRes, collaborativeRes, tracksRes] = await Promise.all([
             getAlbumsByArtist(artistRes.data.name),
+            getCollaborativeAlbumsByArtist(artistRes.data.name),
             getTracksByArtist(artistRes.data.name),
           ]);
           if (albumsRes.code === 200) setAlbums(albumsRes.data);
+          if (collaborativeRes.code === 200) setCollaborativeAlbums(collaborativeRes.data);
           if (tracksRes.code === 200) setTracks(tracksRes.data);
         }
       }
@@ -146,6 +149,38 @@ export default function ArtistDetailScreen() {
             ))}
           </ScrollView>
         </View>
+
+        {collaborativeAlbums.length > 0 && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              合作专辑 ({collaborativeAlbums.length})
+            </Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {collaborativeAlbums.map((album) => (
+                <TouchableOpacity
+                  key={album.id}
+                  style={styles.albumCard}
+                  onPress={() => router.push(`/album/${album.id}`)}
+                >
+                  <Image
+                    source={{
+                      uri: album.cover
+                        ? `${getBaseURL()}${album.cover}`
+                        : `https://picsum.photos/seed/${album.id}/200/200`,
+                    }}
+                    style={styles.albumCover}
+                  />
+                  <Text
+                    style={[styles.albumName, { color: colors.text }]}
+                    numberOfLines={1}
+                  >
+                    {album.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
         {mode !== TrackType.AUDIOBOOK && (
           <View style={[styles.section, styles.trackList]}>
