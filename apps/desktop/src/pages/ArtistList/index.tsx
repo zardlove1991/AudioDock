@@ -1,4 +1,3 @@
-import { getArtistList } from "@soundx/services";
 import { useInfiniteScroll } from "ahooks";
 import {
   Avatar,
@@ -14,6 +13,7 @@ import React, { useEffect, useLayoutEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBaseURL } from "../../https";
 import { type Artist } from "../../models";
+import { getArtistList } from "@soundx/services";
 import { useArtistListCache } from "../../store/artist";
 import { usePlayMode } from "../../utils/playMode";
 import styles from "./index.module.less";

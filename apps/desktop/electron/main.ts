@@ -1,10 +1,7 @@
 import { app, BrowserWindow, dialog, screen as electronScreen, ipcMain, Menu, nativeImage, net, protocol, shell, Tray } from 'electron';
-import fs from 'fs';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import os from "os";
 import path from 'path';
-import { Readable } from 'stream';
-import { pipeline } from 'stream/promises';
 
 function getDeviceName() {
   const hostname = os.hostname().replace(/\.local$/, "");
@@ -46,183 +43,6 @@ ipcMain.handle("select-directory", async () => {
 ipcMain.handle("open-url", (event, url: string) => {
   console.log('Opening URL:', url);
   return shell.openExternal(url);
-});
-
-ipcMain.handle("open-directory", async (event, folderPath: string) => {
-  const fullPath = folderPath.replace(/^~/, os.homedir());
-  if (!fs.existsSync(fullPath)) {
-    try {
-      fs.mkdirSync(fullPath, { recursive: true });
-    } catch (e) {
-      console.error("Failed to create directory:", e);
-      return "Directory does not exist and could not be created";
-    }
-  }
-  return shell.openPath(fullPath);
-});
-
-// ---- Optimized Split Caching & Download Logic ----
-
-const CACHE_DIR = path.join(app.getPath('userData'), 'audio_cache');
-if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
-
-interface TrackMetadata {
-  id: number;
-  path: string;
-  name: string;
-  artist: string;
-  album: string;
-  albumId?: number;
-  duration: number | null;
-  type: string;
-  cover?: string | null;
-  lyrics?: string | null;
-  localPath?: string; // Relative path to audio file from downloadPath
-}
-
-const getTrackAudioLocalPath = (basePath: string, type: string, albumName: string, originalPath: string) => {
-  // Decode the filename from the path to avoid URL encoding in the filename (e.g. %20 -> space)
-  const decodedPath = decodeURIComponent(originalPath);
-  const fileName = path.basename(decodedPath); 
-  const subFolder = type === 'MUSIC' ? 'music' : path.join('audio', albumName.replace(/[/\\?%*:|"<>]/g, '-'));
-  return {
-    filePath: path.join(basePath.replace(/^~/, os.homedir()), subFolder, fileName),
-    relPath: path.join(subFolder, fileName).replace(/\\/g, '/')
-  };
-};
-
-const activeDownloads = new Map<number, Promise<string | null>>();
-
-ipcMain.handle("cache:check", async (event, trackId: number, originalPath: string, downloadPath: string, type: string, albumName: string) => {
-  // 1. Check if metadata exists in cache
-  const metaPath = path.join(CACHE_DIR, `${trackId}.json`);
-  if (!fs.existsSync(metaPath)) return null;
-
-  try {
-    const metadata: TrackMetadata = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-    if (!metadata.localPath) return null;
-
-    // 2. Check if audio file exists in downloadPath
-    const filePath = path.join(downloadPath.replace(/^~/, os.homedir()), metadata.localPath);
-    if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {
-      return `media://audio/${metadata.localPath}`;
-    }
-  } catch (e) {
-    console.error("[Main] cache:check error", e);
-  }
-  return null;
-});
-
-ipcMain.handle("cache:download", async (event, trackId: number, url: string, downloadPath: string, type: string, albumName: string, metadata: TrackMetadata, token?: string) => {
-  if (activeDownloads.has(trackId)) return activeDownloads.get(trackId);
-
-  const downloadPromise = (async () => {
-    let tempPath = '';
-    try {
-      const { filePath, relPath } = getTrackAudioLocalPath(downloadPath, type, albumName, new URL(url).pathname);
-      const dirPath = path.dirname(filePath);
-      if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
-      
-      tempPath = filePath + '.tmp';
-      if (fs.existsSync(filePath)) {
-        // Even if audio exists, ensure metadata is in cache
-        metadata.localPath = relPath;
-        fs.writeFileSync(path.join(CACHE_DIR, `${trackId}.json`), JSON.stringify(metadata, null, 2));
-        return `media://audio/${relPath}`;
-      }
-
-      console.log(`[Main] Starting split download for track ${trackId}: ${url}`);
-      const headers: Record<string, string> = { 'User-Agent': 'SoundX-Desktop' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      // 1. Download Audio to downloadPath
-      const response = await net.fetch(url, { headers });
-      if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
-      const body = response.body;
-      if (!body) throw new Error("Body empty");
-      await pipeline(Readable.fromWeb(body as any), fs.createWriteStream(tempPath));
-      fs.renameSync(tempPath, filePath);
-
-      // 2. Download Cover if exists and store in CACHE_DIR
-      if (metadata.cover) {
-        try {
-          const coverUrl = metadata.cover;
-          console.log(`[Main] Downloading cover: ${coverUrl}`);
-          const coverExt = path.extname(new URL(coverUrl).pathname) || '.jpg';
-          const coverName = `${trackId}_cover${coverExt}`;
-          const cRes = await net.fetch(coverUrl);
-          
-          if (cRes.ok && cRes.body) {
-            const contentType = cRes.headers.get('content-type');
-            if (contentType && contentType.includes('text/html')) {
-              throw new Error("Received HTML instead of image (likely dev server fallback)");
-            }
-
-            const buffer = await cRes.arrayBuffer();
-            // Basic sanity check: first few bytes shouldn't look like HTML
-            const snippet = Buffer.from(buffer.slice(0, 10)).toString();
-            if (snippet.toLowerCase().includes('<!doc') || snippet.toLowerCase().includes('<html')) {
-              throw new Error("Response content looks like HTML");
-            }
-
-            fs.writeFileSync(path.join(CACHE_DIR, coverName), Buffer.from(buffer));
-            metadata.cover = `media://cover/${coverName}`;
-          }
-        } catch (ce) {
-          console.error("[Main] Cover download failed:", ce);
-        }
-      }
-
-      // 3. Write Metadata to CACHE_DIR
-      metadata.localPath = relPath;
-      fs.writeFileSync(path.join(CACHE_DIR, `${trackId}.json`), JSON.stringify(metadata, null, 2));
-
-      console.log(`[Main] Successfully cached/downloaded track ${trackId}`);
-      return `media://audio/${relPath}`;
-    } catch (error) {
-      console.error(`[Main] Split download failed for ${trackId}:`, error);
-      if (tempPath && fs.existsSync(tempPath)) try { fs.unlinkSync(tempPath); } catch(e) {}
-      return null;
-    } finally {
-      activeDownloads.delete(trackId);
-    }
-  })();
-
-  activeDownloads.set(trackId, downloadPromise);
-  return downloadPromise;
-});
-
-ipcMain.handle("cache:list", async (event, downloadPath: string, type: string) => {
-  try {
-    const results: any[] = [];
-    if (!fs.existsSync(CACHE_DIR)) return [];
-
-    const files = fs.readdirSync(CACHE_DIR);
-    for (const file of files) {
-      if (file.endsWith('.json')) {
-        try {
-          const data = JSON.parse(fs.readFileSync(path.join(CACHE_DIR, file), 'utf8'));
-          if (data.type === type) {
-            // Verify audio file still exists
-            const fullAudioPath = path.join(downloadPath.replace(/^~/, os.homedir()), data.localPath);
-            if (fs.existsSync(fullAudioPath)) {
-              results.push(data);
-            }
-          }
-        } catch (e) {}
-      }
-    }
-    return results;
-  } catch (error) {
-    console.error("[Main] cache:list failed", error);
-    return [];
-  }
-});
-
-// We need a way to know the current download path for the protocol handler
-let currentDownloadPath = '';
-ipcMain.on("settings:update-download-path", (event, path: string) => {
-  currentDownloadPath = path;
 });
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -590,127 +410,26 @@ protocol.registerSchemesAsPrivileged([
   {
     scheme: 'app',
     privileges: {
-      standard: true,
-      secure: true,
-      supportFetchAPI: true,
-      bypassCSP: false,
-      corsEnabled: true
-    }
-  },
-  {
-    scheme: 'media',
-    privileges: {
-      standard: true,
-      secure: true,
-      supportFetchAPI: true,
-      bypassCSP: true, 
-      corsEnabled: true, // often needed for media elements
-      stream: true
+      standard: true,          // ← 关键！开启 localStorage、cookie 等
+      secure: true,            // 推荐开启
+      supportFetchAPI: true,   // 推荐开启，尤其是用 fetch 的项目
+      bypassCSP: false         // 通常 false 更安全，除非你真的需要
+      // corsEnabled: true     // 如果有跨域需求再开
     }
   }
 ])
 
 app.whenReady().then(() => {
-  console.log(`[Main] App is ready.`);
-  console.log(`[Main] CACHE_DIR set to: ${CACHE_DIR}`);
-  console.log(`[Main] Initial Download Path: ${currentDownloadPath || 'Default (app/downloads)'}`);
-
   // Register custom protocol for stable localStorage origin
   protocol.handle('app', (request) => {
-    try {
-      const url = new URL(request.url);
-      let pathname = decodeURIComponent(url.pathname);
-      if (pathname.startsWith('/')) pathname = pathname.slice(1);
-      
-      const filePath = path.join(process.env.DIST!, pathname || 'index.html');
-      console.log(`[Main] App Protocol: url=${request.url} -> filePath=${filePath}`);
-      
-      return net.fetch(pathToFileURL(filePath).href);
-    } catch (e) {
-      console.error("[Main] App protocol error:", e);
-      return new Response('Internal error', { status: 500 });
-    }
-  });
-
-  protocol.handle('media', async (request) => {
-    try {
-      const url = new URL(request.url);
-      const host = url.host; 
-      
-      let pathname = url.pathname;
-      if (pathname.startsWith('/')) pathname = pathname.slice(1);
-      
-      const decodedPathname = decodeURIComponent(pathname);
-
-      const getPath = (h: string, p: string) => {
-        if (h === 'audio') {
-          const base = currentDownloadPath || path.join(app.getPath('userData'), 'downloads');
-          return path.join(base.replace(/^~/, os.homedir()), p);
-        } else if (h === 'cover' || h === 'metadata') {
-          return path.join(CACHE_DIR, p);
-        } else {
-          // If host is neither, it could be a legacy file path
-          const base = currentDownloadPath || path.join(app.getPath('userData'), 'audio_cache');
-          return path.join(base.replace(/^~/, os.homedir()), h, p);
-        }
-      };
-
-      let filePath = getPath(host, decodedPathname);
-      
-      // Super defensive: if not found, try searching directly in CACHE_DIR 
-      // This handles cases where host might be misplaced (e.g. media://3371_cover.jpeg)
-      if (!fs.existsSync(filePath)) {
-        const altCachePath = path.join(CACHE_DIR, decodedPathname || host);
-        if (fs.existsSync(altCachePath)) {
-          console.log(`[Main] File found via CACHEFallback: ${altCachePath}`);
-          filePath = altCachePath;
-        }
-      }
-
-      const exists = fs.existsSync(filePath);
-      console.log(`[Main] Media Protocol: url=${request.url} -> host=${host}, path=${decodedPathname} -> filePath=${filePath} (exists: ${exists})`);
-
-      if (!exists) {
-        return new Response('File Not Found', { status: 404 });
-      }
-
-      // Explicitly set MIME types to help renderer
-      const ext = path.extname(filePath).toLowerCase();
-      let contentType = 'application/octet-stream';
-      if (ext === '.jpg' || ext === '.jpeg') contentType = 'image/jpeg';
-      else if (ext === '.png') contentType = 'image/png';
-      else if (ext === '.mp3') contentType = 'audio/mpeg';
-      else if (ext === '.flac') contentType = 'audio/flac';
-      else if (ext === '.json') contentType = 'application/json';
-
-      // For covers and metadata, we can use readFileSync for reliability
-      // For large audio files, net.fetch is preferred for streaming
-      if (host === 'cover' || host === 'metadata' || ext === '.json' || ext === '.jpeg' || ext === '.jpg' || ext === '.png') {
-        const fileData = fs.readFileSync(filePath);
-        return new Response(fileData, {
-          headers: {
-            'Content-Type': contentType,
-            'Access-Control-Allow-Origin': '*',
-            'Cache-Control': 'no-cache'
-          }
-        });
-      }
-
-      const fileUrl = pathToFileURL(filePath).href;
-      const response = await net.fetch(fileUrl);
-      return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: {
-          'Content-Type': contentType,
-          'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'no-cache'
-        }
-      });
-    } catch (e) {
-      console.error("[Main] Protocol handle error:", e);
-      return new Response('Internal error', { status: 500 });
-    }
+    const url = new URL(request.url);
+    const pathname = decodeURIComponent(url.pathname);
+    // On Windows/macOS, pathname might start with / followed by ./ or /
+    // Normalize to get the relative path inside dist
+    let relativePath = pathname === '/' ? 'index.html' : pathname;
+    if (relativePath.startsWith('/')) relativePath = relativePath.slice(1);
+    
+    return net.fetch(`file://${path.join(process.env.DIST!, relativePath)}`);
   });
 
   createWindow();

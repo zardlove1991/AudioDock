@@ -1,5 +1,7 @@
 import {
   AppstoreOutlined,
+  PauseCircleOutlined,
+  PlayCircleOutlined,
   SyncOutlined,
   UnorderedListOutlined,
 } from "@ant-design/icons";
@@ -13,21 +15,22 @@ import {
   Row,
   Segmented,
   Skeleton,
+  Table,
   Timeline,
   Typography,
   theme,
 } from "antd";
 import React, { useRef, useState } from "react";
 import Cover from "../../components/Cover/index";
-import TrackList from "../../components/TrackList";
 import type { Album, TimelineItem, Track } from "../../models";
 import { useAuthStore } from "../../store/auth";
 import { usePlayerStore } from "../../store/player";
+import { formatDuration } from "../../utils/formatDuration";
 import { usePlayMode } from "../../utils/playMode";
 import { formatTimeLabel } from "../../utils/timeFormat";
 import styles from "./index.module.less";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 interface Result {
   list: TimelineItem[];
@@ -40,7 +43,7 @@ const Listened: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState<"album" | "track">("album");
   const { token } = theme.useToken();
-  const { play, setPlaylist } = usePlayerStore();
+  const { play, setPlaylist, currentTrack, isPlaying } = usePlayerStore();
   const { user } = useAuthStore();
 
   const { mode } = usePlayMode();
@@ -172,6 +175,79 @@ const Listened: React.FC = () => {
     setRefreshing(false);
   };
 
+  const handlePlayTrack = (track: Track, tracks: Track[]) => {
+    setPlaylist(tracks);
+    play(track, -1);
+  };
+
+  const columns = [
+    {
+      title: " ",
+      key: "play",
+      width: 50,
+      render: (_: any, record: Track) => {
+        const isCurrent = currentTrack?.id === record.id;
+        return (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              const group = data?.list.find((item) =>
+                item.items.some((t) => t.id === record.id)
+              );
+              if (group) {
+                handlePlayTrack(record, group.items as Track[]);
+              }
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            {isCurrent && isPlaying ? (
+              <PauseCircleOutlined style={{ color: token.colorPrimary }} />
+            ) : (
+              <PlayCircleOutlined />
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      title: "标题",
+      dataIndex: "name",
+      key: "name",
+      render: (text: string, record: Track) => (
+        <Text
+          strong={currentTrack?.id === record.id}
+          style={{
+            color:
+              currentTrack?.id === record.id ? token.colorPrimary : undefined,
+          }}
+        >
+          {text}
+        </Text>
+      ),
+    },
+    {
+      title: "艺术家",
+      dataIndex: "artist",
+      key: "artist",
+      render: (text: string) => <Text type="secondary">{text}</Text>,
+    },
+    {
+      title: "专辑",
+      dataIndex: ["album", "name"],
+      key: "album",
+      render: (text: string) => <Text type="secondary">{text}</Text>,
+    },
+    {
+      title: "时长",
+      dataIndex: "duration",
+      key: "duration",
+      width: 100,
+      render: (duration: number) => (
+        <Text type="secondary">{formatDuration(duration)}</Text>
+      ),
+    },
+  ];
+
   const timelineItems =
     data?.list.map((item) => ({
       children: (
@@ -188,29 +264,18 @@ const Listened: React.FC = () => {
               ))}
             </Row>
           ) : (
-            <TrackList
-              tracks={item.items as Track[]}
-              showIndex={false}
-              showCover={false} // Original 'play' column replaced cover? No, original first column was play icon, no cover displayed? Original code had "play" column with icon. No cover column.
-              // Wait, previous code Step 1274 columns:
-              // 1. Play icon width 50
-              // 2. Title
-              // 3. Artist
-              // 4. Album
-              // 5. Duration
-              // It DID NOT show cover.
-              // I will set showCover={false} to match.
-              // But TrackList shows Play icon over cover if showCover=true.
-              // If showCover=false, TrackList doesn't play on row click? Yes it does: onRow click handlePlayTrack.
-              // I should probably Keep showCover={true} for aesthetics?
-              // User said "Based on Album Detail list". Album Detail HAS cover.
-              // So I will enable cover. It looks better.
-              showArtist={true}
-              showAlbum={true}
-              onPlay={(track, tracks) => {
-                setPlaylist(tracks);
-                play(track, -1);
-              }}
+            <Table
+              dataSource={item.items as Track[]}
+              columns={columns}
+              pagination={false}
+              rowKey="id"
+              showHeader={false}
+              size="small"
+              onRow={(record) => ({
+                onDoubleClick: () => {
+                  handlePlayTrack(record, item.items as Track[]);
+                },
+              })}
             />
           )}
         </div>

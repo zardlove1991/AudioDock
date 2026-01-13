@@ -6,7 +6,13 @@ export class UserTrackLikeService {
   private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL || "file:./dev.db"
+        }
+      }
+    });
   }
 
   async create(data: UserTrackLike) {
@@ -75,3 +81,4 @@ export class UserTrackLikeService {
     });
   }
 }
+

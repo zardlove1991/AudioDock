@@ -1,6 +1,6 @@
 import { useEffect } from "react";
+import { getBaseURL } from "../https";
 import { type Track } from "../models";
-import { getCoverUrl } from "../utils";
 
 interface UseMediaSessionProps {
   currentTrack: Track | null;
@@ -37,7 +37,9 @@ export const useMediaSession = ({
         album: currentTrack.album,
         artwork: [
           {
-            src: getCoverUrl(currentTrack) || "https://picsum.photos/seed/music/300/300",
+            src: currentTrack.cover
+              ? `${getBaseURL()}${currentTrack.cover}`
+              : "https://picsum.photos/seed/music/300/300",
             sizes: "512x512",
             type: "image/jpeg",
           },

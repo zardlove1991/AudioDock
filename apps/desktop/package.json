@@ -1,7 +1,7 @@
 {
   "name": "sound-x",
   "private": true,
-  "version": "1.0.52",
+  "version": "1.0.50",
   "productName": "Sound X",
   "author": "mmdctjj <mmdctjj@gmail.com>",
   "repository": {
@@ -45,7 +45,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "cross-env": "^10.1.0",
-    "electron": "^39.2.3",
+    "electron": "39.2.7",
     "electron-builder": "^26.0.12",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
@@ -54,7 +54,7 @@
     "less": "^4.4.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4",
+    "vite": "^5.4.8",
     "vite-plugin-electron": "^0.29.0",
     "vite-plugin-electron-renderer": "^0.14.6"
   },
@@ -63,7 +63,8 @@
     "productName": "AudioDock",
     "files": [
       "dist/**/*",
-      "dist-electron/**/*"
+      "dist-electron/**/*",
+      "node_modules/**/*"
     ],
     "directories": {
       "output": "release"

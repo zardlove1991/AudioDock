@@ -20,9 +20,10 @@ import TrackPlayer, {
   useProgress,
   useTrackPlayerEvents,
 } from "react-native-track-player";
+import { getBaseURL } from "../https";
 import { Track, TrackType } from "../models";
+import { downloadTrack, isCached } from "../services/cache";
 import { socketService } from "../services/socket";
-import { resolveArtworkUri, resolveTrackUri } from "../services/trackResolver";
 import { PLAYER_EVENTS, playerEventEmitter } from "../utils/playerEvents";
 import { usePlayMode } from "../utils/playMode";
 import { useAuth } from "./AuthContext";
@@ -351,8 +352,14 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         if (state.currentTrack) {
           const track = state.currentTrack;
-          const uri = await resolveTrackUri(track, { cacheEnabled });
-          const artwork = resolveArtworkUri(track);
+          const uri = track.path.startsWith("http")
+            ? track.path
+            : `${getBaseURL()}${track.path}`;
+          const artwork = track.cover
+            ? track.cover.startsWith("http")
+              ? track.cover
+              : `${getBaseURL()}${track.cover}`
+            : undefined;
 
           await TrackPlayer.reset();
           await TrackPlayer.add({
@@ -413,10 +420,32 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   const playTrack = async (track: Track, initialPosition?: number) => {
     if (!isSetup) return;
     try {
-      const playUri = await resolveTrackUri(track, { cacheEnabled });
-      const artwork = resolveArtworkUri(track);
+      const uri = track.path.startsWith("http")
+        ? track.path
+        : `${getBaseURL()}${track.path}`;
 
-      console.log("Playing track:", track.id, "URI:", playUri);
+      const artwork = track.cover
+        ? track.cover.startsWith("http")
+          ? track.cover
+          : `${getBaseURL()}${track.cover}`
+        : undefined;
+      console.log("Playing track:", track);
+
+      let playUri = uri;
+
+      if (cacheEnabled && track.id) {
+        const localPath = await isCached(track.id, track.path);
+        if (localPath) {
+          console.log("Playing from cache:", localPath);
+          playUri = localPath;
+        } else {
+          console.log("Not cached, starting background download");
+          // Don't wait for download, just start it
+          downloadTrack(track.id, uri).catch((e) =>
+            console.error("Cache download failed", e)
+          );
+        }
+      }
 
       await TrackPlayer.reset();
       await TrackPlayer.add({

@@ -1,6 +1,6 @@
 {
   "name": "@soundx/ws",
-  "version": "1.0.52",
+  "version": "1.0.50",
   "description": "Shared WebSocket client for SoundX",
   "author": "mmdctjj <mmdctjj@gmail.com>",
   "repository": {
@@ -12,7 +12,7 @@
   "module": "dist/esm/index.js",
   "scripts": {
     "dev": "father dev",
-    "build": "father build",
+    "build": "npx father build",
     "prepublishOnly": "father doctor && npm run build"
   },
   "types": "dist/esm/index.d.ts",

@@ -1,21 +1,29 @@
+import { PauseCircleFilled, PlayCircleFilled } from "@ant-design/icons";
+import { getAlbumsByArtist, getArtistById, getCollaborativeAlbumsByArtist, getTracksByArtist } from "@soundx/services";
 import {
-  getAlbumsByArtist,
-  getArtistById,
-  getCollaborativeAlbumsByArtist,
-  getTracksByArtist,
-} from "@soundx/services";
-import { Avatar, Col, Empty, Flex, Row, Skeleton, Typography } from "antd";
+    Avatar,
+    Col,
+    Empty,
+    Flex,
+    Row,
+    Skeleton,
+    Table,
+    Typography,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Cover from "../../components/Cover";
-import TrackList from "../../components/TrackList";
+import PlayingIndicator from "../../components/PlayingIndicator";
 import { useMessage } from "../../context/MessageContext";
+import { getBaseURL } from "../../https";
 import { type Album, type Artist, type Track, TrackType } from "../../models";
+import { usePlayerStore } from "../../store/player";
 import { getCoverUrl } from "../../utils";
+import { formatDuration } from "../../utils/formatDuration";
 import { usePlayMode } from "../../utils/playMode";
 import styles from "./index.module.less";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const ArtistDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +34,8 @@ const ArtistDetail: React.FC = () => {
   const [tracks, setTracks] = useState<Track[]>([]);
   const [loading, setLoading] = useState(true);
   const { mode } = usePlayMode();
+  const { play, setPlaylist, currentTrack, isPlaying, pause } =
+    usePlayerStore();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,6 +74,15 @@ const ArtistDetail: React.FC = () => {
 
     fetchData();
   }, [id]);
+
+  const handlePlayTrack = (track: Track) => {
+    setPlaylist(tracks);
+    const shouldResume =
+      track.type === TrackType.AUDIOBOOK &&
+      track.progress &&
+      track.progress > 0;
+    play(track, undefined, shouldResume ? track.progress : 0);
+  };
 
   if (loading) {
     return (
@@ -111,7 +130,11 @@ const ArtistDetail: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <Avatar
-          src={getCoverUrl(artist, artist.id)}
+          src={
+            artist.avatar
+              ? `${getBaseURL()}${artist.avatar}`
+              : `https://picsum.photos/seed/${artist.id}/300/300`
+          }
           size={200}
           shape="circle"
           className={styles.avatar}
@@ -156,11 +179,101 @@ const ArtistDetail: React.FC = () => {
           <Title level={4} className={styles.sectionTitle}>
             所有单曲 ({tracks.length})
           </Title>
-          <TrackList
-            tracks={tracks}
-            type={artist?.type}
-            showAlbum={false}
-            showArtist={false}
+          <Table
+            columns={[
+              {
+                title: "#",
+                key: "index",
+                width: 50,
+                render: (_: number, __: Track, idx: number) => {
+                  return <Text>{idx + 1}</Text>;
+                },
+              },
+              {
+                title: "封面",
+                key: "cover",
+                width: 60,
+                render: (_: number, record: Track) => {
+                  return (
+                    <div
+                      style={{ position: "relative" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePlayTrack(record);
+                      }}
+                    >
+                      <img
+                        src={getCoverUrl(record.cover)}
+                        alt={record.name}
+                        style={{
+                          width: "30px",
+                          height: "30px",
+                          objectFit: "cover",
+                        }}
+                      />
+                      {currentTrack?.id === record.id && isPlaying && (
+                        <div className={styles.playIconStatus}>
+                          <PlayingIndicator />
+                        </div>
+                      )}
+                      {currentTrack?.id === record.id && isPlaying ? (
+                        <PauseCircleFilled className={styles.listPlayIcon} />
+                      ) : (
+                        <PlayCircleFilled className={styles.listPlayIcon} />
+                      )}
+                    </div>
+                  );
+                },
+              },
+              {
+                title: "标题",
+                dataIndex: "name",
+                key: "name",
+                ellipsis: true,
+              },
+              ...(artist?.type === TrackType.AUDIOBOOK
+                ? [
+                    {
+                      title: "进度",
+                      dataIndex: "progress",
+                      key: "progress",
+                      width: 100,
+                      render: (progress: number | undefined, record: Track) => {
+                        if (!progress) return <Text type="secondary">-</Text>;
+                        const percentage =
+                          record.duration && record.duration > 0
+                            ? Math.round((progress / record.duration) * 100)
+                            : 0;
+                        return (
+                          <Text type="secondary" style={{ fontSize: "10px" }}>
+                            {percentage}%
+                          </Text>
+                        );
+                      },
+                    } as unknown as any,
+                  ]
+                : []),
+              {
+                title: "时长",
+                dataIndex: "duration",
+                key: "duration",
+                width: 80,
+                render: (duration: number) => (
+                  <Text type="secondary">{formatDuration(duration)}</Text>
+                ),
+              },
+            ]}
+            dataSource={tracks}
+            pagination={false}
+            onRow={(record) => ({
+              onClick: () => (isPlaying ? pause() : handlePlayTrack(record)),
+              style: { cursor: "pointer" },
+            })}
+            rowClassName={(record) =>
+              currentTrack?.id === record.id
+                ? styles.listCover
+                : styles.listCover
+            }
           />
         </div>
       )}

@@ -1,10 +1,7 @@
-import { resolveArtworkUri } from "../services/trackResolver";
+import { getBaseURL } from "../https";
 
-export const getCoverUrl = (path?: string | null | any, id?: number) => {
-  if (typeof path === "object" && path !== null) {
-    return (
-      resolveArtworkUri(path) || `https://picsum.photos/seed/${path.id || id}/300/300`
-    );
-  }
-  return resolveArtworkUri(path) || `https://picsum.photos/seed/${id}/300/300`;
+export const getCoverUrl = (path?: string | null, id?: number) => {
+  return path
+    ? `${getBaseURL()}${path}`
+    : `https://picsum.photos/seed/${id}/300/300`;
 };

@@ -1,12 +1,14 @@
 import { SettingOutlined, SyncOutlined } from "@ant-design/icons";
-import { getLatestArtists, getLatestTracks, getRecentAlbums, getRecommendedAlbums } from "@soundx/services";
 import { useDebounceFn } from "ahooks";
 import { Avatar, Button, Col, Flex, Row, Skeleton, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cover from "../../components/Cover/index";
+import { getBaseURL } from "../../https";
 import type { Album, Artist, Track } from "../../models";
-import { getCoverUrl } from "../../utils";
+import { getRecentAlbums, getRecommendedAlbums } from "@soundx/services";
+import { getLatestArtists } from "@soundx/services";
+import { getLatestTracks } from "@soundx/services";
 import { cacheUtils } from "../../utils/cache";
 import { usePlayMode } from "../../utils/playMode";
 import styles from "./index.module.less";
@@ -339,7 +341,11 @@ const Recommended: React.FC = () => {
                     style={{ cursor: "pointer", textAlign: "center" }}
                   >
                     <Avatar
-                      src={getCoverUrl(item, item.id)}
+                      src={
+                        item.avatar
+                          ? `${getBaseURL()}${item.avatar}`
+                          : `https://picsum.photos/seed/${item.id}/200/200`
+                      }
                       size={120}
                       icon={!item.avatar && item.name[0]}
                     />

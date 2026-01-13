@@ -8,7 +8,13 @@ export class FolderService {
   private prisma: PrismaClient;
 
   constructor(private readonly trackService: TrackService) {
-    this.prisma = new PrismaClient();
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL || "file:./dev.db"
+        }
+      }
+    });
   }
 
   async getRoots(type: TrackType): Promise<Folder[]> {
@@ -111,7 +117,7 @@ export class FolderService {
     }
 
     // 3. Delete physical directory if empty (optional, but requested "delete original file")
-    // Wait, the user said "删除原文件", for folder this might mean the directory itself.
+    // Wait, the user said "删除原文�?, for folder this might mean the directory itself.
     // However, if there are non-audio files, we might want to be careful.
     // Let's at least try to delete the directory if it's empty.
     if (fs.existsSync(folder.path)) {
@@ -120,7 +126,7 @@ export class FolderService {
         if (files.length === 0) {
           fs.rmdirSync(folder.path);
         } else {
-          // If not empty, maybe delete everything? The user said "删除文件夹会删除原文件"
+          // If not empty, maybe delete everything? The user said "删除文件夹会删除原文�?
           // This usually implies a recursive delete of the directory.
           fs.rmSync(folder.path, { recursive: true, force: true });
         }
@@ -147,3 +153,4 @@ export class FolderService {
     }
   }
 }
+

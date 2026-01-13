@@ -11,6 +11,7 @@ import jwtConfig from './config/jwt.config';
 import { AlbumController } from './controllers/album';
 import { ArtistController } from './controllers/artist';
 import { AudiobookController } from './controllers/audiobook';
+import { CloudImportController } from './controllers/cloud-import';
 import { FolderController } from './controllers/folder';
 import { ImportController } from './controllers/import';
 import { PlaylistController } from './controllers/playlist';
@@ -29,6 +30,7 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { AlbumService } from './services/album';
 import { ArtistService } from './services/artist';
 import { AudiobookService } from './services/audiobook';
+import { CloudImportService } from './services/cloud-import';
 import { FolderService } from './services/folder';
 import { ImportService } from './services/import';
 import { PlaylistService } from './services/playlist';
@@ -82,6 +84,7 @@ import { UserTrackLikeService } from './services/user-track-like';
     UserTrackLikeController,
     AudiobookController,
     ImportController,
+    CloudImportController,
     PlaylistController,
     FolderController,
     SearchRecordController,
@@ -99,6 +102,7 @@ import { UserTrackLikeService } from './services/user-track-like';
     UserTrackHistoryService,
     UserTrackLikeService,
     ImportService,
+    CloudImportService,
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import * as path from 'path';
 import { LogMethod } from '../common/log-method.decorator';
+import { Public } from '../common/public.decorator';
 import { ImportService } from '../services/import';
 
 @Controller('import')
@@ -8,6 +9,7 @@ export class ImportController {
   private readonly logger = new Logger(ImportController.name);
   constructor(private readonly importService: ImportService) { }
 
+  @Public()
   @Post('task')
   @LogMethod()
   async createTask(@Body() body: any) {
@@ -22,6 +24,7 @@ export class ImportController {
     return { code: 200, message: 'success', data: { id } };
   }
 
+  @Public()
   @Get('task/:id')
   @LogMethod()
   async getTask(@Param('id') id: string) {
@@ -32,6 +35,7 @@ export class ImportController {
     return { code: 200, message: 'success', data: task };
   }
 
+  @Public()
   @Get('current-task')
   @LogMethod()
   async getRunningTask() {

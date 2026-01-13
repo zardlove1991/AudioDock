@@ -1,17 +1,17 @@
 import {
-  DeleteOutlined,
-  HeartFilled,
-  HeartOutlined,
-  MoreOutlined,
-  PauseCircleFilled,
-  PlayCircleFilled,
-  PlayCircleOutlined,
-  PlusOutlined,
+    DeleteOutlined,
+    HeartFilled,
+    HeartOutlined,
+    MoreOutlined,
+    PauseCircleFilled,
+    PlayCircleFilled,
+    PlayCircleOutlined,
+    PlusOutlined,
 } from "@ant-design/icons";
 import { Dropdown, List, theme, Typography } from "antd";
 import React from "react";
-import { TrackType, type Album, type Track } from "../../models";
-import { resolveArtworkUri } from "../../services/trackResolver";
+import { getBaseURL } from "../../https";
+import { TrackType, type Track } from "../../models";
 import { useAuthStore } from "../../store/auth";
 import PlayingIndicator from "../PlayingIndicator";
 import styles from "./index.module.less";
@@ -35,12 +35,13 @@ interface QueueListProps {
   style?: React.CSSProperties;
 }
 
-const getCoverUrl = (item?: Track | Album | null) => {
-    if (!item) return `https://picsum.photos/seed/0/300/300`;
-    return resolveArtworkUri(item) || `https://picsum.photos/seed/${item.id}/300/300`;
-  };
+const getCoverUrl = (path?: string | null, id?: number) => {
+  return path
+    ? `${getBaseURL()}${path}`
+    : `https://picsum.photos/seed/${id}/300/300`;
+};
 
-  export const QueueList: React.FC<QueueListProps> = ({
+export const QueueList: React.FC<QueueListProps> = ({
   tracks,
   currentTrack,
   isPlaying,
@@ -148,7 +149,7 @@ const getCoverUrl = (item?: Track | Album | null) => {
               avatar={
                 <div style={{ position: "relative" }}>
                   <img
-                    src={getCoverUrl(item)}
+                    src={getCoverUrl(item.cover, item.id)}
                     alt={item.name}
                     style={{
                       width: "50px",

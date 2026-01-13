@@ -9,7 +9,7 @@ import { getBaseURL } from '../../utils/request'
 import './index.scss'
 
 export default function Index() {
-  const { playTrackList } = usePlayer()
+  const { playTrack } = usePlayer()
   const { mode, setMode } = usePlayMode()
   const [sections, setSections] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -78,8 +78,8 @@ export default function Index() {
       // Potentially refresh or check auth
   })
 
-  const handleTrackPlay = (trackList, index) => {
-      playTrackList(trackList, index)
+  const handleTrackPlay = (track) => {
+      playTrack(track)
   }
 
   const getImageUrl = (url: string | null) => {
@@ -100,7 +100,7 @@ export default function Index() {
         <View className='header'>
           <Text className='header-title'>推荐</Text>
           <View className='mode-toggle' onClick={() => setMode(mode === 'MUSIC' ? 'AUDIOBOOK' : 'MUSIC')}>
-            <Text className={`icon ${mode === 'MUSIC' ? 'icon-music' : 'icon-headset'}`} />
+            <Text>{mode === 'MUSIC' ? '🎵' : '🎧'}</Text>
           </View>
         </View>
 
@@ -118,8 +118,8 @@ export default function Index() {
                <View className='flex-row'>
                 {section.type === 'track' ? (
                    // Simply horizontally list tracks for now, chunking logic can be added later if needed
-                   section.data.map((track, index) => (
-                       <View key={track.id} className='track-card' onClick={() => handleTrackPlay(section.data, index)}>
+                   section.data.map((track) => (
+                       <View key={track.id} className='track-card' onClick={() => handleTrackPlay(track)}>
                           <Image src={getImageUrl(track.cover)} className='track-image' mode='aspectFill'/>
                           <View className='track-info'>
                              <Text className='track-title' numberOfLines={1}>{track.name}</Text>

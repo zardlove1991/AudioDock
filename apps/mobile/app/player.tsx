@@ -566,7 +566,7 @@ export default function PlayerScreen() {
                 styles.landscapeArtworkContainer,
                 !needsAutoHide && {
                   justifyContent: "flex-start",
-                  paddingTop: "40%"
+                  paddingTop: "50%"
                 },
               ]}
             >

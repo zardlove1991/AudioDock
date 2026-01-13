@@ -1,40 +1,40 @@
 import {
-    AudioOutlined,
-    DeleteOutlined,
-    FolderFilled,
-    HomeOutlined,
-    InfoCircleOutlined,
-    MoreOutlined,
-    PlayCircleOutlined,
+  AudioOutlined,
+  DeleteOutlined,
+  FolderFilled,
+  HomeOutlined,
+  InfoCircleOutlined,
+  MoreOutlined,
+  PlayCircleOutlined,
 } from "@ant-design/icons";
 import {
-    batchDeleteItems,
-    deleteFolder,
-    deleteTrack,
-    getFolderContents,
-    getFolderRoots,
-    getFolderStats,
-    type Folder as FolderType,
+  batchDeleteItems,
+  deleteFolder,
+  deleteTrack,
+  getFolderContents,
+  getFolderRoots,
+  getFolderStats,
+  type Folder as FolderType,
 } from "@soundx/services";
 import {
-    Breadcrumb,
-    Button,
-    Checkbox,
-    Col,
-    Dropdown,
-    Empty,
-    message,
-    Modal,
-    Row,
-    Space,
-    Spin,
-    theme,
-    Typography,
+  Breadcrumb,
+  Button,
+  Checkbox,
+  Col,
+  Dropdown,
+  Empty,
+  message,
+  Modal,
+  Row,
+  Space,
+  Spin,
+  theme,
+  Typography,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getBaseURL } from "../../https";
 import { usePlayerStore } from "../../store/player";
-import { getCoverUrl } from "../../utils";
 import { usePlayMode } from "../../utils/playMode";
 import styles from "./index.module.less";
 
@@ -281,7 +281,7 @@ const FolderPage: React.FC = () => {
                 <b>封面:</b>
               </p>
               <img
-                src={getCoverUrl(track, track.id)}
+                src={`${getBaseURL()}${track.cover}`}
                 alt="封面"
                 style={{
                   width: 120,
@@ -491,7 +491,11 @@ const FolderPage: React.FC = () => {
                     >
                       {track.cover ? (
                         <img
-                          src={getCoverUrl(track, track.id)}
+                          src={
+                            track.cover
+                              ? `${getBaseURL()}${track.cover}`
+                              : `https://picsum.photos/seed/${track.id}/300/300`
+                          }
                           alt={track.name}
                           className={styles.cover}
                         />

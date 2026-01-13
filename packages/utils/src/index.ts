@@ -154,6 +154,18 @@ export class LocalMusicScanner {
           }
         }
 
+        // 检查 Vorbis 标签 (used by FLAC, OGG)
+        if (!lyrics && metadata.native && metadata.native.vorbis) {
+          const lyricTag = metadata.native.vorbis.find((tag: any) => 
+            tag.id === 'UNSYNCEDLYRICS' || 
+            tag.id === 'LYRICS' ||
+            tag.id.toLowerCase().includes('lyric')
+          );
+          if (lyricTag && lyricTag.value) {
+            lyrics = lyricTag.value;
+          }
+        }
+
         // If still no lyrics, look for lyrics file in the same directory
         if (!lyrics) {
           lyrics = await this.findLyricsFile(filePath);

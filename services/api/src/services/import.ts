@@ -35,7 +35,13 @@ export class ImportService {
     private readonly albumService: AlbumService,
     private readonly artistService: ArtistService,
   ) {
-    this.prisma = new PrismaClient();
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL || "file:./dev.db"
+        }
+      }
+    });
   }
 
   @LogMethod()
@@ -309,14 +315,14 @@ function chineseToNumber(chinese: string): number {
 }
 
 export function extractEpisodeNumber(title: string): number {
-  // 1. 优先匹配阿拉伯数字（如：1集、第12章、13）
-  let match = title.match(/(\d{1,4})\s*(集|章|节|话)?/);
+  // 1. 优先匹配阿拉伯数字（如：1集、第12章、第3话）
+  let match = title.match(/(\d{1,4})\s*(集|章|节|话)/);
   if (match) {
     return Number(match[1]);
   }
 
   // 2. 匹配中文数字（如：第一集、第二十章、第五十五话）
-  match = title.match(/第?([零〇一二三四五六七八九十百千万两]{1,})[集章节话]?/);
+  match = title.match(/第([零〇一二三四五六七八九十百千万两]{1,})[集章节话]?/);
   if (match) {
     return chineseToNumber(match[1]);
   }

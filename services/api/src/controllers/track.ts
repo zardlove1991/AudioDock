@@ -22,6 +22,7 @@ import { TrackService } from '../services/track';
 export class TrackController {
   constructor(private readonly trackService: TrackService) { }
 
+  @Public()
   @Get('/track/list')
   async getTrackList(): Promise<ISuccessResponse<Track[]> | IErrorResponse> {
     try {

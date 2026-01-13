@@ -1,10 +1,6 @@
-import { getFavoriteTracks, toggleLike, toggleUnLike } from '@soundx/services';
 import { Image, ScrollView, Slider, Text, View } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useEffect, useState } from 'react';
-import AddToPlaylistModal from '../../components/AddToPlaylistModal';
-import PlaylistModal from '../../components/PlaylistModal';
-import { useAuth } from '../../context/AuthContext';
 import { usePlayer } from '../../context/PlayerContext';
 import { usePlayMode } from '../../utils/playMode';
 import { getBaseURL } from '../../utils/request';
@@ -44,17 +40,11 @@ const parseLyrics = (lyrics: string): LyricLine[] => {
 };
 
 export default function Player() {
-  const { currentTrack, isPlaying, pause, resume, playNext, playPrevious, duration, currentTime, seek, setShowPlaylist } = usePlayer();
+  const { currentTrack, isPlaying, pause, resume, playNext, playPrevious, duration, currentTime, seek } = usePlayer();
   const { mode, setMode } = usePlayMode();
-  const { user } = useAuth();
   const [showLyrics, setShowLyrics] = useState(false);
   const [lyrics, setLyrics] = useState<LyricLine[]>([]);
   const [currentLyricIndex, setCurrentLyricIndex] = useState(-1);
-  const [liked, setLiked] = useState(false);
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
-  const [showAddToPlaylist, setShowAddToPlaylist] = useState(false);
-  const [showTimerMenu, setShowTimerMenu] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
 
   useEffect(() => {
     if (currentTrack && currentTrack.lyrics) {
@@ -78,67 +68,6 @@ export default function Player() {
       }
     }
   }, [currentTime, lyrics, currentLyricIndex]);
-
-  // Check if current track is liked
-  useEffect(() => {
-    const checkLikedStatus = async () => {
-      if (!currentTrack || !user) {
-        setLiked(false);
-        return;
-      }
-      try {
-        const res = await getFavoriteTracks(user.id, 0, 100, mode);
-        if (res.code === 200) {
-          const isLiked = res.data.list.some((item: any) => item.track?.id === currentTrack.id);
-          setLiked(isLiked);
-        }
-      } catch (error) {
-        console.error('Failed to check liked status:', error);
-      }
-    };
-    checkLikedStatus();
-  }, [currentTrack, user, mode]);
-
-  const handleToggleLike = async () => {
-    if (!currentTrack || !user) return;
-    const previousLiked = liked;
-    setLiked(!liked);
-
-    try {
-      if (previousLiked) {
-        await toggleUnLike(Number(currentTrack.id), user.id);
-      } else {
-        await toggleLike(Number(currentTrack.id), user.id);
-      }
-    } catch (error) {
-      console.error('Failed to toggle like', error);
-      setLiked(previousLiked);
-      Taro.showToast({ title: '操作失败', icon: 'none' });
-    }
-  };
-
-  const handleNavigateToArtist = () => {
-    if (!currentTrack?.artistId) return;
-    setShowMoreMenu(false);
-    Taro.navigateTo({ url: `/pages/artist/index?id=${currentTrack.artistId}` });
-  };
-
-  const handleNavigateToAlbum = () => {
-    if (!currentTrack?.albumId) return;
-    setShowMoreMenu(false);
-    Taro.navigateTo({ url: `/pages/album/index?id=${currentTrack.albumId}` });
-  };
-
-  const handleSkip = (seconds: number) => {
-    const newTime = Math.max(0, Math.min(duration, currentTime + seconds));
-    seek(newTime);
-  };
-
-  const handleSpeedChange = (speed: number) => {
-    setPlaybackSpeed(speed);
-    // TODO: Implement actual playback speed change via audio context
-    Taro.showToast({ title: `倍速: ${speed}x`, icon: 'none' });
-  };
 
   const getImageUrl = (url: string | null) => {
     if (!url) return `https://picsum.photos/400/400`;
@@ -169,10 +98,10 @@ export default function Player() {
     <View className='player-container'>
         <View className='header'>
             <View className='header-btn' onClick={() => Taro.navigateBack()}>
-                <Text className='icon-btn icon icon-down' />
+                <Text className='icon-btn'>⌄</Text>
             </View>
             <View className='header-btn' onClick={() => {/* more modal */}}>
-                <Text className='icon-btn icon icon-more-v' />
+                <Text className='icon-btn'>⋮</Text>
             </View>
         </View>
 
@@ -217,11 +146,11 @@ export default function Player() {
                         <Text className='track-artist' numberOfLines={1}>{currentTrack.artist}</Text>
                     </View>
                     <View className='action-btns'>
-                        <View className='action-btn' onClick={handleToggleLike}>
-                            <Text className={`action-icon icon ${liked ? 'icon-heart-filled' : 'icon-heart'}`} />
+                        <View className='action-btn' onClick={() => {/* like */}}>
+                            <Text className='action-icon'>♡</Text>
                         </View>
-                        <View className='action-btn' onClick={() => setShowMoreMenu(!showMoreMenu)}>
-                            <Text className='action-icon icon icon-more-h' />
+                        <View className='action-btn' onClick={() => {/* more */}}>
+                            <Text className='action-icon'>⋯</Text>
                         </View>
                     </View>
                 </View>
@@ -244,98 +173,26 @@ export default function Player() {
                 </View>
 
                 <View className='player-controls'>
-                    {mode === 'AUDIOBOOK' ? (
-                        <View className='audiobook-controls'>
-                            <View className='ctrl-btn' onClick={() => handleSkip(-15)}>
-                                <Text className='ctrl-icon-small'>-15s</Text>
-                            </View>
-                            <View className='main-ctrls'>
-                                <View className='ctrl-btn' onClick={playPrevious}>
-                                    <Text className='ctrl-icon icon icon-prev' />
-                                </View>
-                                <View className='play-pause-btn ctrl-btn' onClick={isPlaying ? pause : resume}>
-                                    <Text className={`ctrl-icon-large icon ${isPlaying ? 'icon-pause' : 'icon-play'}`} />
-                                </View>
-                                <View className='ctrl-btn' onClick={playNext}>
-                                    <Text className='ctrl-icon icon icon-next' />
-                                </View>
-                            </View>
-                            <View className='ctrl-btn' onClick={() => handleSkip(15)}>
-                                <Text className='ctrl-icon-small'>+15s</Text>
-                            </View>
+                    <View className='ctrl-btn' onClick={() => setMode(mode === 'MUSIC' ? 'AUDIOBOOK' : 'MUSIC')}>
+                        <Text className='ctrl-icon-small'>{mode === 'MUSIC' ? '🔁' : '🎧'}</Text>
+                    </View>
+                    <View className='main-ctrls'>
+                        <View className='ctrl-btn' onClick={playPrevious}>
+                            <Text className='ctrl-icon'>⏮</Text>
                         </View>
-                    ) : (
-                        <>
-                            <View className='ctrl-btn' onClick={() => setMode(mode === 'MUSIC' ? 'AUDIOBOOK' : 'MUSIC')}>
-                                <Text className={`ctrl-icon-small icon ${mode === 'MUSIC' ? 'icon-repeat' : 'icon-headset'}`} />
-                            </View>
-                            <View className='main-ctrls'>
-                                <View className='ctrl-btn' onClick={playPrevious}>
-                                    <Text className='ctrl-icon icon icon-prev' />
-                                </View>
-                                <View className='play-pause-btn ctrl-btn' onClick={isPlaying ? pause : resume}>
-                                    <Text className={`ctrl-icon-large icon ${isPlaying ? 'icon-pause' : 'icon-play'}`} />
-                                </View>
-                                <View className='ctrl-btn' onClick={playNext}>
-                                    <Text className='ctrl-icon icon icon-next' />
-                                </View>
-                            </View>
-                            <View className='ctrl-btn' onClick={() => setShowPlaylist(true)}>
-                                <Text className='ctrl-icon-small icon icon-list' />
-                            </View>
-                        </>
-                    )}
+                        <View className='ctrl-btn play-pause-btn' onClick={isPlaying ? pause : resume}>
+                            <Text className='ctrl-icon-large'>{isPlaying ? '⏸' : '▶'}</Text>
+                        </View>
+                        <View className='ctrl-btn' onClick={playNext}>
+                            <Text className='ctrl-icon'>⏭</Text>
+                        </View>
+                    </View>
+                    <View className='ctrl-btn' onClick={() => {/* show playlist */}}>
+                        <Text className='ctrl-icon-small'>≡</Text>
+                    </View>
                 </View>
             </View>
         </View>
-
-        {/* More Actions Menu */}
-        {showMoreMenu && (
-          <View className='more-menu-mask' onClick={() => setShowMoreMenu(false)}>
-            <View className='more-menu-content' onClick={(e) => e.stopPropagation()}>
-              <View className='menu-item' onClick={() => { setShowMoreMenu(false); setShowAddToPlaylist(true); }}>
-                <Text className='menu-item-text'>添加到播放列表</Text>
-              </View>
-              <View className='menu-item' onClick={() => { setShowMoreMenu(false); setShowTimerMenu(true); }}>
-                <Text className='menu-item-text'>定时播放</Text>
-              </View>
-              {currentTrack?.artistId && (
-                <View className='menu-item' onClick={handleNavigateToArtist}>
-                  <Text className='menu-item-text'>歌手详情</Text>
-                </View>
-              )}
-              {currentTrack?.albumId && (
-                <View className='menu-item' onClick={handleNavigateToAlbum}>
-                  <Text className='menu-item-text'>专辑详情</Text>
-                </View>
-              )}
-              {mode === 'AUDIOBOOK' && (
-                <View className='menu-section'>
-                  <View className='menu-section-title'>
-                    <Text className='section-title-text'>播放速度</Text>
-                  </View>
-                  <View className='speed-options'>
-                    {[0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map((speed) => (
-                      <View
-                        key={speed}
-                        className={`speed-btn ${playbackSpeed === speed ? 'active' : ''}`}
-                        onClick={() => { handleSpeedChange(speed); setShowMoreMenu(false); }}
-                      >
-                        <Text className={`speed-text ${playbackSpeed === speed ? 'active' : ''}`}>{speed}x</Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              )}
-              <View className='menu-item' onClick={() => setShowMoreMenu(false)}>
-                <Text className='menu-item-text cancel'>取消</Text>
-              </View>
-            </View>
-          </View>
-        )}
-
-        <AddToPlaylistModal visible={showAddToPlaylist} onClose={() => setShowAddToPlaylist(false)} />
-        <PlaylistModal />
     </View>
   );
 }

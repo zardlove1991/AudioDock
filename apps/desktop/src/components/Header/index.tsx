@@ -39,6 +39,7 @@ import { TrackType } from "../../models";
 import { useAuthStore } from "../../store/auth";
 import { isWindows } from "../../utils/platform";
 import { usePlayMode } from "../../utils/playMode";
+import CloudImport from "../CloudImport";
 import SearchResults from "../SearchResults";
 import styles from "./index.module.less";
 
@@ -343,6 +344,7 @@ const Header: React.FC = () => {
             )}
           </div>
         </Tooltip>
+        <CloudImport />
         <Tooltip title="mini播放器">
           <ImportOutlined
             className={styles.actionIcon}

@@ -22,7 +22,6 @@ const PlaylistDetail = lazy(() => import("./pages/PlaylistDetail"));
 const Detail = lazy(() => import("./components/Detail/index"));
 const Settings = lazy(() => import("./pages/Settings/index"));
 const Folder = lazy(() => import("./pages/Folder/index"));
-const Downloads = lazy(() => import("./pages/Downloads/index"));
 
 import { useEffect } from "react";
 import InviteListener from "./components/InviteListener";
@@ -55,7 +54,6 @@ const AppContent = () => {
     if ((window as any).ipcRenderer) {
       (window as any).ipcRenderer.invoke('set-auto-launch', autoLaunch);
       (window as any).ipcRenderer.send('settings:update-minimize-to-tray', minimizeToTray);
-      (window as any).ipcRenderer.send('settings:update-download-path', settings.download.downloadPath);
 
       const handlePositionUpdate = (_event: any, pos: { x: number; y: number }) => {
         useSettingsStore.getState().updateDesktopLyric('x', pos.x);
@@ -159,7 +157,6 @@ const AppContent = () => {
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/folders" element={<Folder />} />
                   <Route path="/folder/:id" element={<Folder />} />
-                  <Route path="/downloads" element={<Downloads />} />
                 </Routes>
               </Suspense>
             </div>

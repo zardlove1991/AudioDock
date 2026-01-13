@@ -3,11 +3,10 @@ import Taro, { useRouter } from '@tarojs/taro';
 import React from 'react';
 import { usePlayer } from '../../context/PlayerContext';
 import { getBaseURL } from '../../utils/request';
-import PlaylistModal from '../PlaylistModal';
 import './index.scss';
 
 const MiniPlayer: React.FC = () => {
-  const { currentTrack, isPlaying, pause, resume, playNext, playPrevious, setShowPlaylist } = usePlayer();
+  const { currentTrack, isPlaying, pause, resume, playNext, playPrevious } = usePlayer();
   const router = useRouter();
   
   const tabPages = ['/pages/index/index', '/pages/library/index', '/pages/personal/index'];
@@ -50,20 +49,19 @@ const MiniPlayer: React.FC = () => {
         </View>
         <View className='mini-controls'>
           <View className='mini-btn' onClick={(e) => { e.stopPropagation(); playPrevious(); }}>
-            <Text className='mini-icon icon icon-prev' />
+            <Text className='mini-icon'>⏮</Text>
           </View>
           <View className='mini-btn play-btn' onClick={handlePlayPause}>
-            <Text className={`mini-icon icon ${isPlaying ? 'icon-pause' : 'icon-play'}`} />
+            <Text className='mini-icon'>{isPlaying ? '⏸' : '▶️'}</Text>
           </View>
           <View className='mini-btn' onClick={(e) => { e.stopPropagation(); playNext(); }}>
-            <Text className='mini-icon icon icon-next' />
+            <Text className='mini-icon'>⏭</Text>
           </View>
-          <View className='mini-btn' onClick={(e) => { e.stopPropagation(); setShowPlaylist(true); }}>
-            <Text className='mini-icon icon icon-list' />
+          <View className='mini-btn' onClick={(e) => { e.stopPropagation(); /* show playlist */ }}>
+            <Text className='mini-icon'>≡</Text>
           </View>
         </View>
       </View>
-      <PlaylistModal />
     </View>
   );
 };

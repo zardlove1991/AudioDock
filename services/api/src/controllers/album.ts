@@ -10,6 +10,7 @@ import {
     Query,
     Req,
 } from '@nestjs/common';
+import { Public } from '../common/public.decorator';
 import { Album, TrackType } from '@soundx/db';
 import { Request } from 'express';
 import {
@@ -30,6 +31,7 @@ export class AlbumController {
     private readonly trackService: TrackService,
   ) { }
 
+  @Public()
   @Get('/album/list')
   @LogMethod()
   async getAlbumList(): Promise<ISuccessResponse<Album[]> | IErrorResponse> {
@@ -347,6 +349,7 @@ export class AlbumController {
     }
   }
 
+  @Public()
   @Get('/album/:id')
   @LogMethod()
   async getAlbumById(

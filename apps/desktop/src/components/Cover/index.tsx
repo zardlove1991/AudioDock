@@ -10,8 +10,8 @@ import { Dropdown, Skeleton, theme, Typography } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMessage } from "../../context/MessageContext";
+import { getBaseURL } from "../../https";
 import type { Album, Track } from "../../models";
-import { resolveArtworkUri } from "../../services/trackResolver";
 import { useAuthStore } from "../../store/auth";
 import { usePlayerStore } from "../../store/player";
 import styles from "./index.module.less";
@@ -19,16 +19,11 @@ import styles from "./index.module.less";
 const { Title, Text } = Typography;
 
 interface CoverComponent
-  extends React.FC<{
-    item: Album | Track;
-    size?: number;
-    isTrack?: boolean;
-    onClick?: (item: Album | Track) => void;
-  }> {
+  extends React.FC<{ item: Album | Track; size?: number; isTrack?: boolean }> {
   Skeleton: React.FC;
 }
 
-const Cover: CoverComponent = ({ item, size, isTrack = false, onClick }) => {
+const Cover: CoverComponent = ({ item, size, isTrack = false }) => {
   const message = useMessage();
   const navigate = useNavigate();
   const { play, setPlaylist } = usePlayerStore();
@@ -59,10 +54,6 @@ const Cover: CoverComponent = ({ item, size, isTrack = false, onClick }) => {
   };
 
   const handleClick = () => {
-    if (onClick) {
-      onClick(item);
-      return;
-    }
     if (isTrack) {
       // For tracks, play directly
       play(item as Track);
@@ -159,7 +150,9 @@ const Cover: CoverComponent = ({ item, size, isTrack = false, onClick }) => {
       <div className={styles.imageWrapper}>
         <img
           src={
-            resolveArtworkUri(item) || `https://picsum.photos/seed/${item.id}/300/300`
+            item.cover
+              ? `${getBaseURL()}${item.cover}`
+              : `https://picsum.photos/seed/${item.id}/300/300`
           }
           alt={item.name}
           className={styles.image}

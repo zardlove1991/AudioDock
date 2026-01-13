@@ -1,19 +1,19 @@
 import {
-    CaretRightFilled,
-    HeartFilled,
-    HeartOutlined,
-    PauseOutlined,
-    PushpinFilled,
-    PushpinOutlined,
-    SelectOutlined,
-    StepBackwardFilled,
-    StepForwardFilled,
-    UnorderedListOutlined,
+  CaretRightFilled,
+  HeartFilled,
+  HeartOutlined,
+  PauseOutlined,
+  PushpinFilled,
+  PushpinOutlined,
+  SelectOutlined,
+  StepBackwardFilled,
+  StepForwardFilled,
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 import { Button, Slider, Tooltip, Typography, theme } from "antd";
 import React, { useEffect, useState } from "react";
+import { getBaseURL } from "../../https";
 import type { Track } from "../../models";
-import { resolveArtworkUri } from "../../services/trackResolver";
 import styles from "./index.module.less";
 
 const { Text } = Typography;
@@ -92,9 +92,8 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onRestore }) => {
     if (onRestore) onRestore();
   };
 
-  const getCoverUrl = (item?: Track | null) => {
-    if (!item) return "https://picsum.photos/200/200";
-    return resolveArtworkUri(item) || "https://picsum.photos/200/200";
+  const getCoverUrl = (path?: string | null) => {
+    return path ? `${getBaseURL()}${path}` : "https://picsum.photos/200/200";
   };
 
   const formatTime = (time: number) => {
@@ -137,7 +136,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onRestore }) => {
 
       {/* Info Section */}
       <div className={styles.infoSection}>
-        <img src={getCoverUrl(currentTrack)} className={styles.cover} />
+        <img src={getCoverUrl(currentTrack?.cover)} className={styles.cover} />
         <div className={styles.infoText}>
           <div className={styles.titleRow}>
             <Text ellipsis className={styles.title}>

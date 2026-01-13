@@ -6,7 +6,13 @@ export class UserAlbumHistoryService {
   private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL || "file:./dev.db"
+        }
+      }
+    });
   }
 
   async create(data: UserAlbumHistory) {
@@ -45,12 +51,10 @@ export class UserAlbumHistoryService {
         album: type ? { type: type as any } : undefined,
       },
       orderBy: {
-        // 按 albumId 分组后，每组按 listenedAt 最大值排序
-        listenedAt: 'desc',
+        // �?albumId 分组后，每组�?listenedAt 最大值排�?        listenedAt: 'desc',
       },
 
-      // 每个 albumId 只保留最新一条
-      distinct: ['albumId'],
+      // 每个 albumId 只保留最新一�?      distinct: ['albumId'],
 
       skip: loadCount * pageSize,
       take: pageSize,
@@ -76,3 +80,4 @@ export class UserAlbumHistoryService {
     return await this.prisma.userAlbumHistory.count();
   }
 }
+

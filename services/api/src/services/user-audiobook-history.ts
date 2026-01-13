@@ -6,7 +6,13 @@ export class UserAudiobookHistoryService {
   private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL || "file:./dev.db"
+        }
+      }
+    });
   }
 
   async create(data: UserAudiobookHistory) {
@@ -66,3 +72,4 @@ export class UserAudiobookHistoryService {
     return await this.prisma.userAudiobookHistory.count();
   }
 }
+

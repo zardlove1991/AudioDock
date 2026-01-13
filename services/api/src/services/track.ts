@@ -9,7 +9,13 @@ export class TrackService {
   private prisma: PrismaClient;
 
   constructor(private readonly configService: ConfigService) {
-    this.prisma = new PrismaClient();
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL || "file:./dev.db"
+        }
+      }
+    });
   }
 
   private getFilePath(trackPath: string): string | null {
@@ -195,7 +201,7 @@ export class TrackService {
           await this.prisma.userAlbumLike.deleteMany({ where: { albumId: track.albumId } });
           await this.prisma.userAlbumHistory.deleteMany({ where: { albumId: track.albumId } });
           await this.prisma.album.delete({ where: { id: track.albumId } });
-          console.log('Album deleted successfully：', track.albumId);
+          console.log('Album deleted successfully:', track.albumId);
         } else if (track.album) {
           // Find album by name and artist if no albumId
           const album = await this.prisma.album.findFirst({
@@ -380,3 +386,4 @@ export class TrackService {
     });
   }
 }
+

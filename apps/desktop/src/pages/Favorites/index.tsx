@@ -1,34 +1,37 @@
 import {
-    AppstoreOutlined,
-    SyncOutlined,
-    UnorderedListOutlined,
+  AppstoreOutlined,
+  PauseCircleOutlined,
+  PlayCircleOutlined,
+  SyncOutlined,
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 import { getFavoriteAlbums, getFavoriteTracks } from "@soundx/services";
 import { useInfiniteScroll } from "ahooks";
 import {
-    Button,
-    Col,
-    Empty,
-    Flex,
-    Row,
-    Segmented,
-    Skeleton,
-    Timeline,
-    Typography,
-    theme,
+  Button,
+  Col,
+  Empty,
+  Flex,
+  Row,
+  Segmented,
+  Skeleton,
+  Table,
+  Timeline,
+  Typography,
+  theme,
 } from "antd";
 import React, { useRef, useState } from "react";
 import Cover from "../../components/Cover/index";
-import TrackList from "../../components/TrackList";
 import type { TimelineItem } from "../../models";
 import { type Album, type Track } from "../../models";
 import { useAuthStore } from "../../store/auth";
 import { usePlayerStore } from "../../store/player";
+import { formatDuration } from "../../utils/formatDuration";
 import { usePlayMode } from "../../utils/playMode";
 import { formatTimeLabel } from "../../utils/timeFormat";
 import styles from "./index.module.less";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 interface Result {
   list: TimelineItem[];
@@ -41,9 +44,9 @@ const Favorites: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState<"album" | "track">("album");
   const { token } = theme.useToken();
-  const { play, setPlaylist } = usePlayerStore();
+  const { play, setPlaylist, currentTrack, isPlaying } = usePlayerStore();
 
-  const { user } = useAuthStore();
+    const { user } = useAuthStore();
 
   const { mode } = usePlayMode();
   const type = mode;
@@ -53,11 +56,7 @@ const Favorites: React.FC = () => {
 
     try {
       if (viewMode === "album") {
-        const res = await getFavoriteAlbums(
-          user?.id || 0,
-          currentLoadCount,
-          20
-        );
+        const res = await getFavoriteAlbums(user?.id || 0, currentLoadCount, 20);
         if (res.code === 200 && res.data) {
           const { list } = res.data;
 
@@ -107,11 +106,7 @@ const Favorites: React.FC = () => {
         }
       } else {
         // Track mode
-        const res = await getFavoriteTracks(
-          user?.id || 0,
-          currentLoadCount,
-          20
-        );
+        const res = await getFavoriteTracks(user?.id || 0, currentLoadCount, 20);
         if (res.code === 200 && res.data) {
           const { list, total: _total } = res.data;
 
@@ -184,6 +179,80 @@ const Favorites: React.FC = () => {
     setRefreshing(false);
   };
 
+  const handlePlayTrack = (track: Track, tracks: Track[]) => {
+    setPlaylist(tracks);
+    play(track, -1);
+  };
+
+  const columns = [
+    {
+      title: " ",
+      key: "play",
+      width: 50,
+      render: (_: any, record: Track) => {
+        const isCurrent = currentTrack?.id === record.id;
+        return (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              // Find the list this track belongs to
+              const group = data?.list.find((item) =>
+                item.items.some((t) => t.id === record.id)
+              );
+              if (group) {
+                handlePlayTrack(record, group.items as Track[]);
+              }
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            {isCurrent && isPlaying ? (
+              <PauseCircleOutlined style={{ color: token.colorPrimary }} />
+            ) : (
+              <PlayCircleOutlined />
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      title: "标题",
+      dataIndex: "name",
+      key: "name",
+      render: (text: string, record: Track) => (
+        <Text
+          strong={currentTrack?.id === record.id}
+          style={{
+            color:
+              currentTrack?.id === record.id ? token.colorPrimary : undefined,
+          }}
+        >
+          {text}
+        </Text>
+      ),
+    },
+    {
+      title: "艺术家",
+      dataIndex: "artist",
+      key: "artist",
+      render: (text: string) => <Text type="secondary">{text}</Text>,
+    },
+    {
+      title: "专辑",
+      dataIndex: ["album", "name"],
+      key: "album",
+      render: (text: string) => <Text type="secondary">{text}</Text>,
+    },
+    {
+      title: "时长",
+      dataIndex: "duration",
+      key: "duration",
+      width: 100,
+      render: (duration: number) => (
+        <Text type="secondary">{formatDuration(duration)}</Text>
+      ),
+    },
+  ];
+
   const timelineItems =
     data?.list.map((item) => ({
       children: (
@@ -200,18 +269,18 @@ const Favorites: React.FC = () => {
               ))}
             </Row>
           ) : (
-            <TrackList
-              tracks={item.items as Track[]}
-              showIndex={false}
-              showArtist={true}
-              showAlbum={true}
-              onPlay={(track, tracks) => {
-                setPlaylist(tracks);
-                play(track, -1);
-              }}
-              // Refresh on delete/like?
-              // If we delete from Favorites, we should probably reload.
-              onRefresh={reload}
+            <Table
+              dataSource={item.items as Track[]}
+              columns={columns}
+              pagination={false}
+              rowKey="id"
+              showHeader={false}
+              size="small"
+              onRow={(record) => ({
+                onDoubleClick: () => {
+                  handlePlayTrack(record, item.items as Track[]);
+                },
+              })}
             />
           )}
         </div>

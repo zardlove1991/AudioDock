@@ -6,7 +6,13 @@ export class AudiobookService {
   private prisma: PrismaClient;
 
   constructor() {
-    this.prisma = new PrismaClient();
+    this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL || "file:./dev.db"
+        }
+      }
+    });
   }
 
   async getAudiobookList(): Promise<Track[]> {
@@ -90,7 +96,7 @@ export class AudiobookService {
     return true;
   }
 
-  // 随机推荐：用户未听过的有声书“专辑”（按 Track.album 聚合）
+  // 随机推荐：用户未听过的有声书"专辑"（从Track.album 聚合）
   async getRandomUnlistenedAudiobookAlbums(
     userId: number,
     limit: number = 8,
@@ -123,7 +129,7 @@ export class AudiobookService {
     const shuffled = unlistenedAlbumNames.sort(() => Math.random() - 0.5);
     const picked = shuffled.slice(0, limit);
 
-    // 为每个专辑名取一个代表 Track（最新）
+    // 为每个专辑名取一个代表Track（最新）
     const result: Track[] = [];
     for (const name of picked) {
       const t = await this.prisma.track.findFirst({
@@ -135,3 +141,4 @@ export class AudiobookService {
     return result;
   }
 }
+

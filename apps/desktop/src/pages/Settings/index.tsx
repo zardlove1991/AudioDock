@@ -17,37 +17,9 @@ const Settings: React.FC = () => {
     updateDownload,
   } = useSettingsStore();
 
-  const [cacheSize, setCacheSize] = React.useState<string>("正在计算...");
-
-  const fetchCacheSize = async () => {
-    if ((window as any).ipcRenderer) {
-      const size = await (window as any).ipcRenderer.invoke("cache:get-size");
-      setCacheSize(formatSize(size));
-    }
-  };
-
-  const formatSize = (bytes: number) => {
-    if (bytes === 0) return "0 B";
-    const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
-
-  const handleClearCache = async () => {
-    if ((window as any).ipcRenderer) {
-      await (window as any).ipcRenderer.invoke("cache:clear");
-      await fetchCacheSize();
-    }
-  };
-
-  React.useEffect(() => {
-    fetchCacheSize();
-  }, []);
-
   const handleSelectDirectory = async () => {
-    if ((window as any).ipcRenderer && (window as any).ipcRenderer.selectDirectory) {
-      const path = await (window as any).ipcRenderer.selectDirectory();
+    if (window.ipcRenderer && window.ipcRenderer.selectDirectory) {
+      const path = await window.ipcRenderer.selectDirectory();
       if (path) {
         updateDownload("downloadPath", path);
       }
@@ -291,24 +263,6 @@ const Settings: React.FC = () => {
                     onChange={(val) => updateDownload('concurrentDownloads', val)}
                     className={styles.inputNumber}
                 />
-            </div>
-        </div>
-        <div className={styles.settingItem}>
-            <div className={styles.label}>边听边存</div>
-            <div className={styles.control}>
-                <Space>
-                    <Switch checked={download.cacheEnabled} onChange={(val) => updateDownload('cacheEnabled', val)} />
-                    <Text className={styles.description}>播放网络音频时自动缓存到本地，下次播放优先使用缓存</Text>
-                </Space>
-            </div>
-        </div>
-        <div className={styles.settingItem}>
-            <div className={styles.label}>清除缓存</div>
-            <div className={styles.control}>
-                <Space>
-                    <Button onClick={handleClearCache}>立即清理</Button>
-                    <Text className={styles.description}>当前已用缓存: {cacheSize}</Text>
-                </Space>
             </div>
         </div>
       </section>

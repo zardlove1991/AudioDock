@@ -1,30 +1,30 @@
 import { useFocusEffect } from "@react-navigation/native";
 import {
-    createImportTask,
-    createPlaylist,
-    getAlbumHistory,
-    getFavoriteAlbums,
-    getFavoriteTracks,
-    getImportTask,
-    getPlaylists,
-    getRunningImportTask,
-    getTrackHistory,
-    TaskStatus,
-    type ImportTask
+  createImportTask,
+  createPlaylist,
+  getAlbumHistory,
+  getFavoriteAlbums,
+  getFavoriteTracks,
+  getImportTask,
+  getPlaylists,
+  getRunningImportTask,
+  getTrackHistory,
+  TaskStatus,
+  type ImportTask
 } from "@soundx/services";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Image,
-    Modal,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../../src/context/AuthContext";
@@ -32,12 +32,11 @@ import { usePlayer } from "../../src/context/PlayerContext";
 import { useTheme } from "../../src/context/ThemeContext";
 import { getBaseURL } from "../../src/https";
 import { Playlist, Track } from "../../src/models";
-import { getDownloadedTracks, removeDownloadedTrack } from "../../src/services/cache";
 import { usePlayMode } from "../../src/utils/playMode";
 
 import { Ionicons } from "@expo/vector-icons";
 
-type TabType = "playlists" | "favorites" | "history" | "downloads";
+type TabType = "playlists" | "favorites" | "history";
 type SubTabType = "track" | "album";
 
 const StackedCover = ({ tracks }: { tracks: any[] }) => {
@@ -99,9 +98,6 @@ export default function PersonalScreen() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [favorites, setFavorites] = useState<any[]>([]);
   const [history, setHistory] = useState<any[]>([]);
-  const [downloads, setDownloads] = useState<Track[]>([]);
-  const [downloadedAlbums, setDownloadedAlbums] = useState<any[]>([]);
-  const [selectedDownloadAlbum, setSelectedDownloadAlbum] = useState<any | null>(null);
 
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState("");
@@ -119,13 +115,6 @@ export default function PersonalScreen() {
         loadData();
       }
     }, [user, activeTab, activeSubTab, mode])
-  );
-  
-  // Reset selected album when tab changes or mode changes
-  useFocusEffect(
-      useCallback(() => {
-          setSelectedDownloadAlbum(null);
-      }, [activeTab, mode])
   );
 
   React.useEffect(() => {
@@ -168,50 +157,12 @@ export default function PersonalScreen() {
           const res = await getAlbumHistory(user.id, 0, 10000, mode as any);
           if (res.code === 200) setHistory(res.data.list.map((item: any) => item.album));
         }
-      } else if (activeTab === "downloads") {
-          const tracks = await getDownloadedTracks();
-          // Filter by current mode? The user might want to see all or filtered.
-          // Usually apps filter by mode.
-          const filtered = tracks.filter(t => t.type === mode);
-          setDownloads(filtered);
-          
-          if (mode === "AUDIOBOOK") {
-              const albumMap = new Map();
-              filtered.forEach(track => {
-                  if (!albumMap.has(track.album)) {
-                      albumMap.set(track.album, {
-                          id: track.album || "unknown", // Use name as ID
-                          name: track.album,
-                          artist: track.artist,
-                          cover: track.cover,
-                          type: "album",
-                          tracks: []
-                      });
-                  }
-                  albumMap.get(track.album).tracks.push(track);
-              });
-              setDownloadedAlbums(Array.from(albumMap.values()));
-          }
       }
     } catch (error) {
       console.error("Failed to load personal data:", error);
     } finally {
       setLoading(false);
     }
-  };
-  
-  const handleDeleteDownload = (item: Track) => {
-      Alert.alert("删除下载", "确定要删除这首歌曲的下载吗？", [
-          { text: "取消", style: "cancel" },
-          { 
-              text: "删除", 
-              style: "destructive", 
-              onPress: async () => {
-                  await removeDownloadedTrack(item.id, item.path); // Use path as URL
-                  loadData();
-              }
-          }
-      ]);
   };
 
   const handleCreatePlaylist = async () => {
@@ -311,21 +262,11 @@ export default function PersonalScreen() {
 
   const renderItem = React.useCallback(({ item }: { item: any }) => {
     const isPlaylist = activeTab === "playlists";
-    const isAlbum = activeTab !== "playlists" && activeTab !== "downloads" && (mode === "AUDIOBOOK" || activeSubTab === "album");
-    const isDownloadAlbum = activeTab === "downloads" && mode === "AUDIOBOOK" && !selectedDownloadAlbum && (item.type === "album");
-    
-    // For downloads, if we are in audiobook mode and selected an album, we render tracks. 
-    // Wait, FlatList data source is controlled.
-    
+    const isAlbum = activeTab !== "playlists" && (mode === "AUDIOBOOK" || activeSubTab === "album");
     const data = item;
     let coverUrl = "https://picsum.photos/100";
     
     if (item.cover) {
-      // For local tracks, item.cover might be local path? Or we saved the global URL?
-      // Our save logic saved the whole track object as is, including cover URL.
-      // But if we are offline, we can't load http cover.
-      // Ideally we cached cover too. But we didn't implement cover caching.
-      // We will assume online for now, or fallback.
       coverUrl = item.cover.startsWith("http") ? item.cover : `${getBaseURL()}${item.cover}`;
     }
     
@@ -337,50 +278,23 @@ export default function PersonalScreen() {
             router.push(`/playlist/${(data as Playlist).id}`);
           } else if (isAlbum) {
             router.push(`/album/${data.id}`);
-          } else if (activeTab === "downloads") {
-              if (isDownloadAlbum) {
-                  // Enter album
-                  setSelectedDownloadAlbum(data);
-              } else {
-                  // Play downloaded track
-                  // Data source depends on view.
-                  const list = selectedDownloadAlbum ? selectedDownloadAlbum.tracks : downloads;
-                  const index = list.findIndex((t: Track) => t.id === (data as Track).id);
-                  playTrackList(list, index);
-              }
           } else {
             const list = activeTab === "favorites" ? favorites : history;
             const index = list.findIndex(t => t.id === (data as Track).id);
             playTrackList(list, index);
           }
         }}
-        onLongPress={() => {
-            if (activeTab === "downloads" && !isDownloadAlbum) {
-                handleDeleteDownload(data as Track);
-            }
-        }}
       >
         {isPlaylist ? (
           <StackedCover tracks={(item as Playlist).tracks || []} />
         ) : (
           <View style={{ position: 'relative' }}>
-            {isDownloadAlbum ? (
-                // Use a folder icon or similar if cover missing?
-                // Or just use first track cover if we aggregated?
-                // We passed cover in albumMap.
-                 <Image
-                  source={{ uri: coverUrl }}
-                  style={styles.itemCover}
-                />
-            ) : (
-                <Image
-                  source={{ uri: coverUrl }}
-                  style={styles.itemCover}
-                />
-            )}
-            
+            <Image
+              source={{ uri: coverUrl }}
+              style={styles.itemCover}
+            />
             {/* Progress Bar for Audiobook Albums */}
-            {(isAlbum || isDownloadAlbum) && activeTab === "history" && mode === "AUDIOBOOK" && (data as any).progress > 0 && (
+            {isAlbum && activeTab === "history" && mode === "AUDIOBOOK" && (data as any).progress > 0 && (
                 <View style={{
                     position: 'absolute',
                     bottom: 0,
@@ -405,40 +319,12 @@ export default function PersonalScreen() {
           <Text style={[styles.itemSubtitle, { color: colors.secondary }]}>
             {isPlaylist 
               ? `${(data as Playlist)._count?.tracks || (data as Playlist).tracks?.length || 0} 首` 
-              : ((isAlbum || isDownloadAlbum) ? (data.artist || "") : (data as Track).artist)}
+              : (isAlbum ? (data.artist || "") : (data as Track).artist)}
           </Text>
         </View>
-        
-        {activeTab === "downloads" && !isDownloadAlbum && (
-             <TouchableOpacity style={{ padding: 10 }} onPress={() => handleDeleteDownload(data)}>
-                 <Ionicons name="trash-outline" size={20} color={colors.secondary} />
-             </TouchableOpacity>
-        )}
       </TouchableOpacity>
     );
-  }, [activeTab, activeSubTab, colors, favorites, history, downloads, selectedDownloadAlbum, downloadModeList(), playTrackList, mode]); // Need helper for download list dependency?
-  
-  function downloadModeList() {
-      if (activeTab !== "downloads") return [];
-      if (mode === "AUDIOBOOK") {
-          return selectedDownloadAlbum ? selectedDownloadAlbum.tracks : downloadedAlbums;
-      }
-      return downloads;
-  }
-
-  // Helper to determine data to show
-  const getListData = () => {
-    if (activeTab === "playlists") return playlists;
-    if (activeTab === "favorites") return favorites;
-    if (activeTab === "history") return history;
-    if (activeTab === "downloads") {
-         if (mode === "AUDIOBOOK") {
-             return selectedDownloadAlbum ? selectedDownloadAlbum.tracks : downloadedAlbums;
-         }
-         return downloads;
-    }
-    return [];
-  };
+  }, [activeTab, activeSubTab, colors, favorites, history, playTrackList, mode]);
 
   return (
     <View
@@ -474,7 +360,6 @@ export default function PersonalScreen() {
           { key: "playlists", label: "播放列表" },
           { key: "favorites", label: "收藏" },
           { key: "history", label: "听过" },
-          { key: "downloads", label: "下载" },
         ].map((tab) => (
           <TouchableOpacity
             key={tab.key}
@@ -532,21 +417,6 @@ export default function PersonalScreen() {
           ))}
         </View>
       )}
-      
-      {/* Back Button for Audiobook Downloads */}
-      {activeTab === "downloads" && mode === "AUDIOBOOK" && selectedDownloadAlbum && (
-           <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
-               <TouchableOpacity 
-                  style={{ flexDirection: 'row', alignItems: 'center' }}
-                  onPress={() => setSelectedDownloadAlbum(null)}
-                >
-                   <Ionicons name="arrow-back" size={20} color={colors.primary} />
-                   <Text style={{ marginLeft: 5, color: colors.primary, fontSize: 16 }}>
-                       返回 {selectedDownloadAlbum.name}
-                   </Text>
-               </TouchableOpacity>
-           </View>
-      )}
 
       {/* List Content */}
       {loading ? (
@@ -555,9 +425,9 @@ export default function PersonalScreen() {
         </View>
       ) : (
         <FlatList
-          data={getListData()}
+          data={activeTab === "playlists" ? playlists : (activeTab === "favorites" ? favorites : history)}
           renderItem={renderItem}
-          keyExtractor={(item) => (item.id || item.name).toString() + (item.type || "")} // item.id might be duplicated if same album in multiple contexts? Or safe.
+          keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingBottom: 20 }}
           ListEmptyComponent={
             <View style={styles.center}>
@@ -927,27 +797,26 @@ const styles = StyleSheet.create({
     left: 20,
     borderRadius: 12,
     paddingVertical: 8,
-    paddingHorizontal: 0,
     minWidth: 200,
-    elevation: 5,
+    elevation: 8,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
   },
   menuItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      gap: 12
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
   },
   menuItemText: {
-      fontSize: 16
+    fontSize: 16,
   },
   menuDivider: {
-      height: 1,
-      width: '100%'
+    height: 0.5,
+    marginHorizontal: 16,
   },
   importModalOverlay: {
     flex: 1,
@@ -956,7 +825,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   importModalContent: {
-    width: "80%",
+    width: "85%",
     borderRadius: 20,
     padding: 24,
   },
@@ -964,38 +833,41 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 20,
+    textAlign: "center",
   },
   importStatusRow: {
     flexDirection: 'row',
-    marginBottom: 10,
+    marginBottom: 16,
   },
   importErrorText: {
-    marginBottom: 15,
+    marginBottom: 16,
+    fontSize: 14,
   },
   progressBarContainer: {
-    height: 6,
-    borderRadius: 3,
-    width: '100%',
+    height: 10,
+    borderRadius: 5,
     overflow: 'hidden',
-    marginBottom: 15,
+    marginBottom: 12,
   },
   progressBarFill: {
     height: '100%',
   },
   importCounts: {
+    textAlign: 'center',
     fontSize: 12,
-    marginBottom: 20,
+    marginBottom: 24,
   },
   importCloseBtn: {
     paddingVertical: 12,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
   },
   importCloseBtnText: {
     fontWeight: 'bold',
+    fontSize: 16,
   },
   importHideBtn: {
     paddingVertical: 12,
     alignItems: 'center',
-  }
+  },
 });
