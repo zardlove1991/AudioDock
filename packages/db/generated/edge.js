@@ -253,7 +253,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\wlsk\\videoDock\\packages\\db\\generated",
+      "value": "D:\\wlsk\\AudioDock\\packages\\db\\generated",
       "fromEnvVar": null
     },
     "config": {
@@ -271,7 +271,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\wlsk\\videoDock\\packages\\db\\prisma\\schema.prisma",
+    "sourceFilePath": "D:\\wlsk\\AudioDock\\packages\\db\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
