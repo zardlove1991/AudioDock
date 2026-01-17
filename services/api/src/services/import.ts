@@ -38,19 +38,35 @@ export class ImportService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
 
   @LogMethod()
-  createTask(musicPath: string, audiobookPath: string, cachePath: string, mode: 'incremental' | 'full' = 'incremental'): string {
+  createTask(
+    musicPath: string,
+    audiobookPath: string,
+    cachePath: string,
+    mode: 'incremental' | 'full' = 'incremental',
+    options?: {
+      musicUrlBasePath?: string;
+      audiobookUrlBasePath?: string;
+    },
+  ): string {
     const id = randomUUID();
     this.tasks.set(id, { id, status: TaskStatus.INITIALIZING, mode });
 
-    this.startImport(id, musicPath, audiobookPath, cachePath, mode).catch(err => {
-      console.error("Unhandled import error", err);
+    this.startImport(
+      id,
+      musicPath,
+      audiobookPath,
+      cachePath,
+      mode,
+      options,
+    ).catch((err) => {
+      console.error('Unhandled import error', err);
     });
 
     return id;
@@ -64,13 +80,20 @@ export class ImportService {
   @LogMethod()
   getRunningTask(): ImportTask | undefined {
     return Array.from(this.tasks.values()).find(
-      task => task.status === TaskStatus.INITIALIZING || task.status === TaskStatus.PARSING
+      (task) =>
+        task.status === TaskStatus.INITIALIZING ||
+        task.status === TaskStatus.PARSING,
     );
   }
 
-  private convertToHttpUrl(localPath: string, type: 'cover' | 'audio' | 'music', basePath: string): string {
+  private convertToHttpUrl(
+    localPath: string,
+    type: 'cover' | 'audio' | 'music',
+    basePath: string,
+  ): string {
     // Calculate relative path from base directory to preserve folder structure
     const relativePath = path.relative(basePath, localPath);
+    const normalizedRelativePath = relativePath.split(path.sep).join('/');
 
     if (type === 'cover') {
       // For covers, just use filename (existing behavior)
@@ -78,7 +101,7 @@ export class ImportService {
       return `/covers/${filename}`;
     } else {
       // For audio, preserve the relative path structure
-      return `/${type}/${relativePath}`;
+      return `/${type}/${normalizedRelativePath}`;
     }
   }
 
@@ -107,12 +130,22 @@ export class ImportService {
     this.logger.log('Full library cleanup completed.');
   }
 
-  private async startImport(id: string, musicPath: string, audiobookPath: string, cachePath: string, mode: 'incremental' | 'full') {
+  private async startImport(
+    id: string,
+    musicPath: string,
+    audiobookPath: string,
+    cachePath: string,
+    mode: 'incremental' | 'full',
+    options?: {
+      musicUrlBasePath?: string;
+      audiobookUrlBasePath?: string;
+    },
+  ) {
     const task = this.tasks.get(id);
     if (!task) return;
 
     try {
-      console.log("startImport", id, musicPath, audiobookPath, cachePath, mode);
+      console.log('startImport', id, musicPath, audiobookPath, cachePath, mode);
 
       if (mode === 'full') {
         await this.clearLibraryData();
@@ -135,37 +168,56 @@ export class ImportService {
       // Cache for folder IDs to reduce DB queries
       const folderCache = new Map<string, number>();
 
-      const getFolderId = async (localPath: string, basePath: string, type: TrackType): Promise<number | null> => {
+      const getFolderId = async (
+        localPath: string,
+        basePath: string,
+        type: TrackType,
+      ): Promise<number | null> => {
         const dirPath = path.dirname(localPath);
         const cacheKey = `${dirPath}`;
-        
+
         if (folderCache.has(cacheKey)) {
           return folderCache.get(cacheKey)!;
         }
 
-        const folderId = await this.getOrCreateFolderHierarchically(dirPath, basePath, type);
+        const folderId = await this.getOrCreateFolderHierarchically(
+          dirPath,
+          basePath,
+          type,
+        );
         if (folderId) {
           folderCache.set(cacheKey, folderId);
         }
         return folderId;
       };
 
-      const processItem = async (item: any, type: TrackType, audioBasePath: string, index: number) => {
+      const processItem = async (
+        item: any,
+        type: TrackType,
+        audioBasePath: string,
+        urlBasePath: string,
+        index: number,
+      ) => {
         const artistName = item.artist || '未知';
         const albumName = item.album || '未知';
 
         // Convert local cover path to HTTP URL
-        const coverUrl = item.coverPath ? this.convertToHttpUrl(item.coverPath, 'cover', cachePath) : null;
-
+        const coverUrl = item.coverPath
+          ? this.convertToHttpUrl(item.coverPath, 'cover', cachePath)
+          : null;
 
         // Convert local audio path to HTTP URL, preserving relative path from base directory
-        const audioUrl = this.convertToHttpUrl(item.path, type === TrackType.AUDIOBOOK ? 'audio' : 'music', audioBasePath);
+        const audioUrl = this.convertToHttpUrl(
+          item.path,
+          type === TrackType.AUDIOBOOK ? 'audio' : 'music',
+          urlBasePath,
+        );
 
         // Track ID to collect for playlist
         let trackId: number;
 
-         // Handle Folder (Compute this first as it's needed for both new and existing tracks)
-         const folderId = await getFolderId(item.path, audioBasePath, type);
+        // Handle Folder (Compute this first as it's needed for both new and existing tracks)
+        const folderId = await getFolderId(item.path, audioBasePath, type);
 
         // CHECK EXISTENCE (Incremental Mode Logic)
         const existingTrack = await this.trackService.findByPath(audioUrl);
@@ -175,9 +227,8 @@ export class ImportService {
 
           // Check if folderId needs update
           if (existingTrack.folderId !== folderId && folderId) {
-             await this.trackService.updateTrack(existingTrack.id, { folderId });
+            await this.trackService.updateTrack(existingTrack.id, { folderId });
           }
-           
         } else {
           // 1. Handle Artist
           let artist = await this.artistService.findByName(artistName, type);
@@ -187,19 +238,23 @@ export class ImportService {
             artist = await this.artistService.createArtist({
               name: artistName,
               avatar: coverUrl,
-              type: type
+              type: type,
             });
           }
 
           // 2. Handle Album
-          let album = await this.albumService.findByName(albumName, artistName, type);
+          let album = await this.albumService.findByName(
+            albumName,
+            artistName,
+            type,
+          );
           if (!album) {
             album = await this.albumService.createAlbum({
               name: albumName,
               artist: artistName,
               cover: coverUrl,
               year: item.year ? String(item.year) : null,
-              type: type
+              type: type,
             });
           }
 
@@ -219,7 +274,7 @@ export class ImportService {
             type: type,
             createdAt: new Date(),
             fileModifiedAt: item?.mtime ? new Date(item.mtime) : null,
-            episodeNumber: extractEpisodeNumber(item.title || ""),
+            episodeNumber: extractEpisodeNumber(item.title || ''),
             artistId: artist.id,
             albumId: album.id,
             folderId: folderId,
@@ -227,22 +282,32 @@ export class ImportService {
           trackId = newTrack.id;
         }
 
-
         task.current = (task.current || 0) + 1;
       };
 
       // Save Music (sequential to avoid duplicate creation)
       for (const [index, item] of musicResults.entries()) {
-        console.log("music", item);
-        await processItem(item || {}, TrackType.MUSIC, musicPath, index);
+        console.log('music', item);
+        await processItem(
+          item || {},
+          TrackType.MUSIC,
+          musicPath,
+          options?.musicUrlBasePath || musicPath,
+          index,
+        );
       }
 
       // Save Audiobooks (sequential to avoid duplicate creation)
       for (const [index, item] of audiobookResults.entries()) {
-        console.log("audiobook", item);
-        await processItem(item || {}, TrackType.AUDIOBOOK, audiobookPath, index);
+        console.log('audiobook', item);
+        await processItem(
+          item || {},
+          TrackType.AUDIOBOOK,
+          audiobookPath,
+          options?.audiobookUrlBasePath || audiobookPath,
+          index,
+        );
       }
-
 
       task.status = TaskStatus.SUCCESS;
     } catch (error) {
@@ -252,7 +317,11 @@ export class ImportService {
     }
   }
 
-  private async getOrCreateFolderHierarchically(localPath: string, basePath: string, type: TrackType): Promise<number | null> {
+  private async getOrCreateFolderHierarchically(
+    localPath: string,
+    basePath: string,
+    type: TrackType,
+  ): Promise<number | null> {
     const relativePath = path.relative(basePath, localPath);
     if (relativePath === '' || relativePath === '.') return null;
 
@@ -279,15 +348,25 @@ export class ImportService {
   }
 }
 
-
-
 // 将中文数字转为阿拉伯数字
 function chineseToNumber(chinese: string): number {
   const map: Record<string, number> = {
-    "零": 0, "〇": 0,
-    "一": 1, "二": 2, "两": 2, "三": 3, "四": 4,
-    "五": 5, "六": 6, "七": 7, "八": 8, "九": 9,
-    "十": 10, "百": 100, "千": 1000, "万": 10000,
+    零: 0,
+    〇: 0,
+    一: 1,
+    二: 2,
+    两: 2,
+    三: 3,
+    四: 4,
+    五: 5,
+    六: 6,
+    七: 7,
+    八: 8,
+    九: 9,
+    十: 10,
+    百: 100,
+    千: 1000,
+    万: 10000,
   };
 
   let num = 0;

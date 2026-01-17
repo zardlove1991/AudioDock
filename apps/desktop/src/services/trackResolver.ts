@@ -16,12 +16,18 @@ export const resolveTrackUri = async (
 ): Promise<string> => {
   const { cacheEnabled } = options;
 
+  const normalizedTrackPath = track.path ? track.path.replace(/\\/g, "/") : "";
+
   // 1. Construct the remote URI (if path exists)
   let remoteUri = "";
-  if (track.path) {
-    remoteUri = track.path.startsWith("http")
-      ? track.path
-      : `${getBaseURL()}${track.path}`;
+  if (normalizedTrackPath) {
+    const normalizedForJoin = normalizedTrackPath.startsWith("/")
+      ? normalizedTrackPath
+      : `/${normalizedTrackPath}`;
+    const rawUri = normalizedForJoin.startsWith("http")
+      ? normalizedForJoin
+      : `${getBaseURL()}${normalizedForJoin}`;
+    remoteUri = encodeURI(rawUri);
   }
 
   // Support playback from local list even if path is missing (for legacy or offline tracks)
@@ -45,7 +51,7 @@ export const resolveTrackUri = async (
       const cachedPath = await (window as any).ipcRenderer.invoke(
         "cache:check", 
         track.id, 
-        track.path, 
+        normalizedTrackPath || track.path, 
         downloadPath, 
         track.type, 
         albumName
@@ -61,7 +67,7 @@ export const resolveTrackUri = async (
       // Prepare metadata for offline use
       const metadata = {
         id: track.id,
-        path: track.path,
+        path: normalizedTrackPath || track.path,
         name: track.name,
         artist: track.artist,
         album: albumName,

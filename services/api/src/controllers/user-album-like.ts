@@ -1,16 +1,25 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { UserAlbumLike } from '@soundx/db';
 import { Request } from 'express';
 import {
-    IErrorResponse,
-    ILoadMoreData,
-    ISuccessResponse,
-    ITableData,
+  IErrorResponse,
+  ILoadMoreData,
+  ISuccessResponse,
+  ITableData,
 } from 'src/common/const';
 import { UserAlbumLikeService } from '../services/user-album-like';
 @Controller('user-album-likes')
 export class UserAlbumLikeController {
-  constructor(private readonly userAlbumLikeService: UserAlbumLikeService) { }
+  constructor(private readonly userAlbumLikeService: UserAlbumLikeService) {}
 
   @Post()
   async create(
@@ -61,7 +70,10 @@ export class UserAlbumLikeController {
     try {
       const userId = (req.user as any)?.userId;
       const albumIdNum = parseInt(albumId, 10);
-      const data = await this.userAlbumLikeService.removeByUserAndAlbum(Number(userId), albumIdNum);
+      const data = await this.userAlbumLikeService.removeByUserAndAlbum(
+        Number(userId),
+        albumIdNum,
+      );
       return {
         code: 200,
         message: 'success',

@@ -1,11 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { UserTrackHistory } from '@soundx/db';
 import { Request } from 'express';
 import {
-    IErrorResponse,
-    ILoadMoreData,
-    ISuccessResponse,
-    ITableData,
+  IErrorResponse,
+  ILoadMoreData,
+  ISuccessResponse,
+  ITableData,
 } from 'src/common/const';
 import { UserTrackHistoryService } from '../services/user-track-history';
 
@@ -13,7 +22,7 @@ import { UserTrackHistoryService } from '../services/user-track-history';
 export class UserTrackHistoryController {
   constructor(
     private readonly userTrackHistoryService: UserTrackHistoryService,
-  ) { }
+  ) {}
 
   @Post()
   async create(
@@ -71,7 +80,9 @@ export class UserTrackHistoryController {
           pageSize,
           current,
         );
-      const total = await this.userTrackHistoryService.userTrackHistoryCount(Number(userId));
+      const total = await this.userTrackHistoryService.userTrackHistoryCount(
+        Number(userId),
+      );
       return {
         code: 200,
         message: 'success',
@@ -101,16 +112,17 @@ export class UserTrackHistoryController {
   > {
     try {
       const userId = (req.user as any)?.userId;
-      const pageSizeNum = Number(pageSize)
-      const loadCountNum = Number(loadCount)
-      const userIdNum = Number(userId)
+      const pageSizeNum = Number(pageSize);
+      const loadCountNum = Number(loadCount);
+      const userIdNum = Number(userId);
       const list = await this.userTrackHistoryService.loadMoreUserTrackHistory(
         pageSizeNum,
         loadCountNum,
         userIdNum,
         type,
       );
-      const total = await this.userTrackHistoryService.userTrackHistoryCount(userIdNum);
+      const total =
+        await this.userTrackHistoryService.userTrackHistoryCount(userIdNum);
       return {
         code: 200,
         message: 'success',

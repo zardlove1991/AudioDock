@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { TrackType } from '@soundx/db';
 import { FolderService } from '../services/folder';
 
@@ -19,7 +27,11 @@ export class FolderController {
       return { code: 404, message: 'Folder not found' };
     }
     const path = await this.folderService.getPath(Number(id));
-    return { code: 200, message: 'success', data: { ...contents, breadcrumbs: path } };
+    return {
+      code: 200,
+      message: 'success',
+      data: { ...contents, breadcrumbs: path },
+    };
   }
 
   @Get(':id/stats')
@@ -39,7 +51,10 @@ export class FolderController {
 
   @Post('batch-delete')
   async batchDelete(@Body() body: { folderIds: number[]; trackIds: number[] }) {
-    await this.folderService.batchDelete(body.folderIds || [], body.trackIds || []);
+    await this.folderService.batchDelete(
+      body.folderIds || [],
+      body.trackIds || [],
+    );
     return { code: 200, message: 'success' };
   }
 }

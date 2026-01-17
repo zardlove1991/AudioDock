@@ -1,17 +1,26 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { UserTrackLike } from '@soundx/db';
 import { Request } from 'express';
 import {
-    IErrorResponse,
-    ILoadMoreData,
-    ISuccessResponse,
-    ITableData,
+  IErrorResponse,
+  ILoadMoreData,
+  ISuccessResponse,
+  ITableData,
 } from 'src/common/const';
 import { UserTrackLikeService } from '../services/user-track-like';
 
 @Controller('user-track-likes')
 export class UserTrackLikeController {
-  constructor(private readonly userTrackLikeService: UserTrackLikeService) { }
+  constructor(private readonly userTrackLikeService: UserTrackLikeService) {}
 
   @Post('/create')
   async create(
@@ -20,7 +29,10 @@ export class UserTrackLikeController {
   ): Promise<ISuccessResponse<UserTrackLike> | IErrorResponse> {
     try {
       const userId = (req.user as any)?.userId;
-      const data = await this.userTrackLikeService.create({ ...bodyData, userId: Number(userId) });
+      const data = await this.userTrackLikeService.create({
+        ...bodyData,
+        userId: Number(userId),
+      });
       return {
         code: 200,
         message: 'success',
@@ -139,7 +151,6 @@ export class UserTrackLikeController {
   @Get(':id')
   async findOne(
     @Param('id') id: string,
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   ): Promise<ISuccessResponse<UserTrackLike | null> | IErrorResponse> {
     try {
       const data = await this.userTrackLikeService.findOne(+id);
@@ -155,7 +166,6 @@ export class UserTrackLikeController {
       };
     }
   }
-
 
   @Delete('/unlike')
   async removeByUserAndTrack(

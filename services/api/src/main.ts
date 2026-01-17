@@ -9,17 +9,19 @@ import { ImportService } from './services/import';
 import { TrackService } from './services/track';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bufferLogs: true,
+  });
   app.useLogger(app.get(Logger));
 
   // Enable CORS
   app.enableCors();
 
-
-  const cacheDir = path.resolve(process.env.CACHE_DIR || './');
-  const musicBaseDir = path.resolve(process.env.MUSIC_BASE_DIR || './');
-  const audioBookDir = path.resolve(process.env.AUDIO_BOOK_DIR || './');
-
+  const cacheDir = path.resolve(process.env.CACHE_DIR || './cache');
+  const musicBaseDir = path.resolve(process.env.MUSIC_BASE_DIR || './music');
+  const audioBookDir = path.resolve(
+    process.env.AUDIO_BOOK_DIR || './audiobooks',
+  );
 
   // Serve static files from cache directory
   // This allows accessing covers via http://localhost:3000/covers/filename.jpg
@@ -32,6 +34,18 @@ async function bootstrap() {
   // Serve music files
   console.log(`Serving music files from: ${musicBaseDir}`);
   app.useStaticAssets(musicBaseDir, {
+    prefix: '/music/',
+  });
+  app.useStaticAssets(path.resolve('./downloads'), {
+    prefix: '/music/',
+  });
+  app.useStaticAssets(path.resolve('./downloads/jspace'), {
+    prefix: '/music/',
+  });
+  app.useStaticAssets(path.resolve('./downloads/baidu'), {
+    prefix: '/music/',
+  });
+  app.useStaticAssets(path.resolve('./downloads/aliyun'), {
     prefix: '/music/',
   });
 
@@ -48,7 +62,6 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
 
   // 启动完成后调用 service
   const trackService = app.get(TrackService);

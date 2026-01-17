@@ -9,9 +9,9 @@ export class UserService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
   getHello(): string {

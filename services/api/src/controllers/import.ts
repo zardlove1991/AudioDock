@@ -7,20 +7,31 @@ import { ImportService } from '../services/import';
 @Controller('import')
 export class ImportController {
   private readonly logger = new Logger(ImportController.name);
-  constructor(private readonly importService: ImportService) { }
+  constructor(private readonly importService: ImportService) {}
 
   @Public()
   @Post('task')
   @LogMethod()
   async createTask(@Body() body: any) {
-    let { musicPath, audiobookPath, cachePath, mode } = body;
+    let { musicPath, audiobookPath, cachePath } = body;
+    const { mode } = body;
 
     // Use server-side defaults from environment variables checks
-    if (!musicPath) musicPath = path.resolve(process.env.MUSIC_BASE_DIR || './');
-    if (!audiobookPath) audiobookPath = path.resolve(process.env.AUDIO_BOOK_DIR || './');
-    if (!cachePath) cachePath = path.resolve(process.env.CACHE_DIR || './');
+    if (!musicPath)
+      musicPath = path.resolve(process.env.MUSIC_BASE_DIR || './music');
+    if (!audiobookPath)
+      audiobookPath = path.resolve(
+        process.env.AUDIO_BOOK_DIR || './audiobooks',
+      );
+    if (!cachePath)
+      cachePath = path.resolve(process.env.CACHE_DIR || './cache');
 
-    const id = await this.importService.createTask(musicPath, audiobookPath, cachePath, mode || 'incremental');
+    const id = await this.importService.createTask(
+      musicPath,
+      audiobookPath,
+      cachePath,
+      mode || 'incremental',
+    );
     return { code: 200, message: 'success', data: { id } };
   }
 

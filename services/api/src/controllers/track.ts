@@ -20,7 +20,7 @@ import { TrackService } from '../services/track';
 
 @Controller()
 export class TrackController {
-  constructor(private readonly trackService: TrackService) { }
+  constructor(private readonly trackService: TrackService) {}
 
   @Public()
   @Get('/track/list')
@@ -149,9 +149,7 @@ export class TrackController {
     @Query('deleteAlbum') deleteAlbum?: string,
   ): Promise<ISuccessResponse<boolean> | IErrorResponse> {
     try {
-      const isSuccess = await this.trackService.deleteTrack(
-        parseInt(id)
-      );
+      const isSuccess = await this.trackService.deleteTrack(parseInt(id));
       return {
         code: 200,
         message: 'success',
@@ -166,9 +164,13 @@ export class TrackController {
   }
 
   @Get('/track/:id/deletion-impact')
-  async getDeletionImpact(
-    @Param('id') id: string,
-  ): Promise<ISuccessResponse<{ isLastTrackInAlbum: boolean; albumName: string | null }> | IErrorResponse> {
+  async getDeletionImpact(@Param('id') id: string): Promise<
+    | ISuccessResponse<{
+        isLastTrackInAlbum: boolean;
+        albumName: string | null;
+      }>
+    | IErrorResponse
+  > {
     try {
       const impact = await this.trackService.checkDeletionImpact(parseInt(id));
       return {
@@ -244,7 +246,11 @@ export class TrackController {
   ): Promise<ISuccessResponse<Track[]> | IErrorResponse> {
     try {
       const limitNum = limit ? parseInt(limit, 10) : 10;
-      const tracks = await this.trackService.searchTracks(keyword, type, limitNum);
+      const tracks = await this.trackService.searchTracks(
+        keyword,
+        type,
+        limitNum,
+      );
       return {
         code: 200,
         message: 'success',

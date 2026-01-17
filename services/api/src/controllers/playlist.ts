@@ -1,11 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { TrackType } from '@soundx/db';
 import { Request } from 'express';
 import { PlaylistService } from '../services/playlist';
 
 @Controller('playlists')
 export class PlaylistController {
-  constructor(private readonly playlistService: PlaylistService) { }
+  constructor(private readonly playlistService: PlaylistService) {}
 
   @Post()
   async create(@Req() req: Request, @Body() body: any) {
@@ -70,7 +80,10 @@ export class PlaylistController {
   }
 
   @Post(':id/tracks/batch')
-  async addTracks(@Param('id') id: string, @Body('trackIds') trackIds: number[]) {
+  async addTracks(
+    @Param('id') id: string,
+    @Body('trackIds') trackIds: number[],
+  ) {
     try {
       const data = await this.playlistService.addTracks(+id, trackIds);
       return { code: 200, message: 'success', data };
@@ -80,7 +93,10 @@ export class PlaylistController {
   }
 
   @Delete(':id/tracks/:trackId')
-  async removeTrack(@Param('id') id: string, @Param('trackId') trackId: string) {
+  async removeTrack(
+    @Param('id') id: string,
+    @Param('trackId') trackId: string,
+  ) {
     try {
       const data = await this.playlistService.removeTrack(+id, +trackId);
       return { code: 200, message: 'success', data };

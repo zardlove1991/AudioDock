@@ -19,10 +19,10 @@ import { UserService } from '../services/user';
 
 @Controller()
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Public()
-  @Get("/hello")
+  @Get('/hello')
   async hello(): Promise<ISuccessResponse<string> | IErrorResponse> {
     return {
       code: 200,

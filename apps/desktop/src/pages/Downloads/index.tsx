@@ -143,10 +143,11 @@ const Downloads: React.FC = () => {
         <Row gutter={[16, 16]}>
           {albums.map((album) => (
             <Col key={album.name}>
-              <Cover
-                item={album as Album}
-                onClick={() => setSelectedAlbum(album)}
-              />
+              <div onClick={() => setSelectedAlbum(album)}>
+                <Cover
+                  item={album as Album}
+                />
+              </div>
             </Col>
           ))}
         </Row>

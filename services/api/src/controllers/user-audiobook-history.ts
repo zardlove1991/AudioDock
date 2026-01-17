@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { UserAudiobookHistory } from '@soundx/db';
 import { Request } from 'express';
 import {
@@ -13,7 +21,7 @@ import { UserAudiobookHistoryService } from '../services/user-audiobook-history'
 export class UserAudiobookHistoryController {
   constructor(
     private readonly userAudiobookHistoryService: UserAudiobookHistoryService,
-  ) { }
+  ) {}
 
   @Post()
   async create(

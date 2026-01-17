@@ -9,15 +9,15 @@ export class SearchRecordService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
 
   async addRecord(userId: number, keyword: string) {
     if (!keyword || keyword.trim() === '') return;
-    
+
     return this.prisma.searchRecord.create({
       data: {
         userId,
@@ -34,7 +34,9 @@ export class SearchRecordService {
       take: 100, // Look at recent 100 to find unique ones
     });
 
-    const uniqueKeywords = Array.from(new Set(records.map(r => r.keyword))).slice(0, limit);
+    const uniqueKeywords = Array.from(
+      new Set(records.map((r) => r.keyword)),
+    ).slice(0, limit);
     return uniqueKeywords;
   }
 
@@ -58,7 +60,7 @@ export class SearchRecordService {
       take: limit,
     });
 
-    return stats.map(s => ({
+    return stats.map((s) => ({
       keyword: s.keyword,
       count: s._count.keyword,
     }));
@@ -70,4 +72,3 @@ export class SearchRecordService {
     });
   }
 }
-

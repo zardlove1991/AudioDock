@@ -54,9 +54,9 @@ import { UserTrackLikeService } from './services/user-track-like';
         transport:
           process.env.NODE_ENV !== 'production'
             ? {
-              target: require.resolve('pino-pretty'),
-              options: { singleLine: true },
-            }
+                target: require.resolve('pino-pretty'),
+                options: { singleLine: true },
+              }
             : undefined,
       },
     }),
@@ -122,4 +122,4 @@ import { UserTrackLikeService } from './services/user-track-like';
     SyncGateway,
   ],
 })
-export class AppModule { }
+export class AppModule {}

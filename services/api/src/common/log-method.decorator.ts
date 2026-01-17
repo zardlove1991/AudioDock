@@ -5,11 +5,7 @@ import { Logger } from '@nestjs/common';
  * 使用 NestJS 的 Logger，日志前缀为 `${target.constructor.name}.${propertyKey}`。
  */
 export function LogMethod() {
-  return (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) => {
+  return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
     const logger = new Logger(`${target.constructor.name}.${propertyKey}`);
 

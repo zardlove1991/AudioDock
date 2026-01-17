@@ -9,9 +9,9 @@ export class AlbumService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
 
@@ -19,7 +19,11 @@ export class AlbumService {
     return await this.prisma.album.findMany();
   }
 
-  async findByName(name: string, artist?: string, type?: any): Promise<Album | null> {
+  async findByName(
+    name: string,
+    artist?: string,
+    type?: any,
+  ): Promise<Album | null> {
     const where: any = { name };
     if (artist) where.artist = artist;
     if (type) where.type = type;
@@ -57,7 +61,12 @@ export class AlbumService {
     });
   }
 
-  async loadMoreAlbum(pageSize: number, loadCount: number, type: TrackType, userId: number): Promise<Album[]> {
+  async loadMoreAlbum(
+    pageSize: number,
+    loadCount: number,
+    type: TrackType,
+    userId: number,
+  ): Promise<Album[]> {
     const skip = loadCount;
     const albums = await this.prisma.album.findMany({
       where: type ? { type } : undefined,
@@ -108,7 +117,11 @@ export class AlbumService {
   }
 
   // 新增：最近专辑（按id倒序）
-  async getLatestAlbums(limit = 8, type: TrackType, userId: number): Promise<Album[]> {
+  async getLatestAlbums(
+    limit = 8,
+    type: TrackType,
+    userId: number,
+  ): Promise<Album[]> {
     const albums = await this.prisma.album.findMany({
       where: type ? { type } : undefined,
       orderBy: { id: 'desc' },
@@ -122,7 +135,11 @@ export class AlbumService {
   }
 
   // 新增：获取随机专辑
-  async getRandomAlbums(limit = 8, type: TrackType, userId: number): Promise<Album[]> {
+  async getRandomAlbums(
+    limit = 8,
+    type: TrackType,
+    userId: number,
+  ): Promise<Album[]> {
     const count = await this.prisma.album.count({
       where: type ? { type } : undefined,
     });
@@ -140,7 +157,11 @@ export class AlbumService {
   }
 
   // 随机推荐：用户未听过的专辑
-  async getRandomUnlistenedAlbums(userId: number, limit = 8, type?: TrackType): Promise<Album[]> {
+  async getRandomUnlistenedAlbums(
+    userId: number,
+    limit = 8,
+    type?: TrackType,
+  ): Promise<Album[]> {
     const albums = await this.prisma.album.findMany({
       where: type ? { type } : undefined,
       take: 100, // 从中随机选择
@@ -151,12 +172,14 @@ export class AlbumService {
     return shuffled.slice(0, limit);
   }
 
-  async searchAlbums(keyword: string, type: any, limit: number = 10, userId: number): Promise<Album[]> {
+  async searchAlbums(
+    keyword: string,
+    type: any,
+    limit: number = 10,
+    userId: number,
+  ): Promise<Album[]> {
     const where: any = {
-      OR: [
-        { name: { contains: keyword } },
-        { artist: { contains: keyword } },
-      ],
+      OR: [{ name: { contains: keyword } }, { artist: { contains: keyword } }],
     };
 
     if (type) {
@@ -178,12 +201,16 @@ export class AlbumService {
           let score = 0;
 
           if (nName === normalizedKeyword) score = Math.max(score, 100);
-          else if (nName.startsWith(normalizedKeyword)) score = Math.max(score, 90);
-          else if (nName.includes(normalizedKeyword)) score = Math.max(score, 70);
+          else if (nName.startsWith(normalizedKeyword))
+            score = Math.max(score, 90);
+          else if (nName.includes(normalizedKeyword))
+            score = Math.max(score, 70);
 
           if (nArtist === normalizedKeyword) score = Math.max(score, 80);
-          else if (nArtist.startsWith(normalizedKeyword)) score = Math.max(score, 60);
-          else if (nArtist.includes(normalizedKeyword)) score = Math.max(score, 50);
+          else if (nArtist.startsWith(normalizedKeyword))
+            score = Math.max(score, 60);
+          else if (nArtist.includes(normalizedKeyword))
+            score = Math.max(score, 50);
 
           return score;
         };
@@ -203,7 +230,10 @@ export class AlbumService {
   }
 
   // Helper: Attach progress to audiobook albums - Simplified version
-  private async attachProgressToAlbums(albums: Album[], userId: number): Promise<Album[]> {
+  private async attachProgressToAlbums(
+    albums: Album[],
+    userId: number,
+  ): Promise<Album[]> {
     // For now, just return albums without progress
     return albums;
   }

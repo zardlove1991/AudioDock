@@ -1,11 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { UserAlbumHistory } from '@soundx/db';
 import { Request } from 'express';
 import {
-    IErrorResponse,
-    ILoadMoreData,
-    ISuccessResponse,
-    ITableData,
+  IErrorResponse,
+  ILoadMoreData,
+  ISuccessResponse,
+  ITableData,
 } from 'src/common/const';
 import { UserAlbumHistoryService } from '../services/user-album-history';
 
@@ -13,7 +22,7 @@ import { UserAlbumHistoryService } from '../services/user-album-history';
 export class UserAlbumHistoryController {
   constructor(
     private readonly userAlbumHistoryService: UserAlbumHistoryService,
-  ) { }
+  ) {}
 
   @Post()
   async create(
@@ -128,7 +137,8 @@ export class UserAlbumHistoryController {
         userIdNum,
         type,
       );
-      const total = await this.userAlbumHistoryService.userAlbumHistoryCount(userIdNum);
+      const total =
+        await this.userAlbumHistoryService.userAlbumHistoryCount(userIdNum);
 
       return {
         code: 200,
@@ -167,5 +177,3 @@ export class UserAlbumHistoryController {
     }
   }
 }
-
-

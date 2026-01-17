@@ -1,72 +1,53 @@
 import {
   CloudDownloadOutlined,
-  FolderOpenOutlined,
   LoadingOutlined,
   CheckCircleOutlined,
   ExclamationCircleOutlined,
-  DeleteOutlined,
-  EyeOutlined,
   LinkOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import {
   Button,
   Card,
-  Checkbox,
   Empty,
   Input,
+  InputNumber,
   Modal,
   Progress,
+  Radio,
   Select,
   Space,
   Spin,
   Tree,
-  message,
   Typography,
 } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useMessage } from '../../context/MessageContext';
+import {
+  getCloudProviders,
+  authWithProvider,
+  handleAuthCallback,
+  getCloudFiles,
+  importCloudFiles,
+  getImportTaskStatus,
+  configureJSpace,
+  CloudTaskStatus,
+  type CloudProvider,
+  type CloudFile,
+  type CloudImportTask,
+  type JSpaceConfig
+} from '@soundx/services';
 import styles from './index.module.less';
 
-const { Title, Text, Link } = Typography;
+const { Title, Text } = Typography;
 const { DirectoryTree } = Tree;
-
-interface CloudProvider {
-  id: string;
-  name: string;
-  displayName: string;
-  enabled: boolean;
-}
-
-interface CloudFile {
-  id: string;
-  name: string;
-  path: string;
-  size: number;
-  type: 'file' | 'folder';
-  mimeType?: string;
-  downloadUrl?: string;
-  modifiedTime?: string;
-  children?: CloudFile[];
-}
-
-interface CloudImportTask {
-  id: string;
-  status: 'INITIALIZING' | 'PARSING' | 'SUCCESS' | 'FAILED';
-  provider: string;
-  files: string[];
-  total?: number;
-  current?: number;
-  downloaded?: number;
-  message?: string;
-  downloadPath?: string;
-}
+const { Option } = Select;
 
 const CloudImport: React.FC = () => {
   const messageApi = useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [providers, setProviders] = useState<CloudProvider[]>([]);
   const [selectedProvider, setSelectedProvider] = useState<string>('');
-  const [authWindow, setAuthWindow] = useState<Window | null>(null);
   const [accessToken, setAccessToken] = useState<string>('');
   const [files, setFiles] = useState<CloudFile[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(false);
@@ -74,40 +55,40 @@ const CloudImport: React.FC = () => {
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
   const [importTask, setImportTask] = useState<CloudImportTask | null>(null);
   const [loading, setLoading] = useState(false);
+  const [jspaceModalVisible, setJspaceModalVisible] = useState(false);
+  const [jspaceConfig, setJspaceConfig] = useState<JSpaceConfig>({ url: '', username: '', password: '' });
+  
+  // 新增：目录和深度控制状态
+  const [selectedPath, setSelectedPath] = useState<string>('/');
+  const [maxDepth, setMaxDepth] = useState<number>(2);
+  const [customPath, setCustomPath] = useState<string>('');
+  const [pathInputMode, setPathInputMode] = useState<'preset' | 'custom'>('preset');
 
-  // 获取可用的网盘提供商
-  const fetchProviders = async () => {
+  // 获取云盘提供商列表
+  const fetchProviders = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:3001/cloud-import/providers');
-      const data = await response.json();
-      if (data.code === 200) {
-        setProviders(data.data);
+      const response = await getCloudProviders();
+      if (response.code === 200) {
+        setProviders(response.data);
       }
-    } catch (error) {
+    } catch {
       messageApi.error('获取网盘提供商失败');
     }
-  };
+  }, [messageApi]);
 
   // 处理OAuth认证
   const handleAuth = async (providerId: string) => {
     try {
-      const response = await fetch(`http://localhost:3001/cloud-import/auth/${providerId}`);
-      const data = await response.json();
+      const response = await authWithProvider(providerId);
       
-      if (data.code === 200) {
-        const newWindow = window.open(
-          data.data.url,
-          'oauth',
-          'width=800,height=600,scrollbars=yes,resizable=yes'
-        );
-        
-        setAuthWindow(newWindow);
+      if (response.code === 200 && response.data.authUrl) {
+        // 打开OAuth授权页面
+        const authWindow = window.open(response.data.authUrl, 'oauth', 'width=800,height=600,scrollbars=yes,resizable=yes');
         
         // 监听认证窗口关闭或回调
         const checkClosed = setInterval(() => {
-          if (newWindow?.closed) {
+          if (authWindow?.closed) {
             clearInterval(checkClosed);
-            setAuthWindow(null);
           }
         }, 1000);
 
@@ -115,25 +96,15 @@ const CloudImport: React.FC = () => {
         const handleMessage = async (event: MessageEvent) => {
           if (event.data.type === 'cloud-auth-callback') {
             clearInterval(checkClosed);
-            newWindow?.close();
-            setAuthWindow(null);
+            authWindow?.close();
             
             // 处理认证回调
-            const callbackResponse = await fetch('http://localhost:3001/cloud-import/auth/callback', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                provider: providerId,
-                code: event.data.code,
-                state: event.data.state
-              })
-            });
+            const callbackResponse = await handleAuthCallback(providerId, event.data.code);
             
-            const callbackData = await callbackResponse.json();
-            if (callbackData.code === 200) {
-              setAccessToken(callbackData.data.accessToken);
+            if (callbackResponse.code === 200) {
+              setAccessToken(callbackResponse.data.accessToken);
               messageApi.success('认证成功');
-              await fetchFiles(providerId, callbackData.data.accessToken);
+              await fetchFiles(providerId, callbackResponse.data.accessToken);
             } else {
               messageApi.error('认证失败');
             }
@@ -144,10 +115,10 @@ const CloudImport: React.FC = () => {
         
         window.addEventListener('message', handleMessage);
       } else {
-        messageApi.error('获取认证链接失败');
+        messageApi.error('获取授权链接失败');
       }
-    } catch (error) {
-      messageApi.error('认证失败');
+    } catch {
+      messageApi.error('授权失败');
     }
   };
 
@@ -155,17 +126,32 @@ const CloudImport: React.FC = () => {
   const fetchFiles = async (providerId: string, token?: string) => {
     setLoadingFiles(true);
     try {
-      const response = await fetch(
-        `http://localhost:3001/cloud-import/files/${providerId}?accessToken=${token || accessToken}`
-      );
-      const data = await response.json();
+      // 对于极空间，使用特殊标识
+      const useToken = providerId === 'jspace' ? 'jspace-configured' : (token || accessToken);
       
-      if (data.code === 200) {
-        setFiles(data.data);
+      // 构建查询参数
+      const params: any = {};
+      if (providerId === 'jspace') {
+        // 极空间支持路径和深度参数
+        const currentPath = pathInputMode === 'custom' ? customPath : selectedPath;
+        if (currentPath !== '/') {
+          params.path = currentPath;
+        }
+        if (maxDepth !== 2) {
+          params.maxDepth = maxDepth;
+        }
+      }
+      
+      const response = await getCloudFiles(providerId, useToken, {
+        ...params
+      });
+      
+      if (response.code === 200) {
+        setFiles(response.data);
       } else {
         messageApi.error('获取文件列表失败');
       }
-    } catch (error) {
+    } catch {
       messageApi.error('获取文件列表失败');
     } finally {
       setLoadingFiles(false);
@@ -173,17 +159,16 @@ const CloudImport: React.FC = () => {
   };
 
   // 转换文件数据为Tree组件格式
-  const convertToTreeData = (fileList: CloudFile[], parentPath = ''): any[] => {
+  const convertToTreeData = (fileList: CloudFile[]): any[] => {
     return fileList
       .filter(file => file.type === 'folder' || isAudioFile(file))
       .map(file => ({
         title: file.name,
-        key: file.id,
+        key: file.path || file.id,
         isLeaf: file.type === 'file',
-        children: file.type === 'folder' && file.children 
-          ? convertToTreeData(file.children, file.path) 
-          : [],
-        data: file
+        children: file.type === 'folder' && file.children
+          ? convertToTreeData(file.children)
+          : []
       }));
   };
 
@@ -194,9 +179,8 @@ const CloudImport: React.FC = () => {
   };
 
   // 处理文件选择
-  const handleFileSelect = (checkedKeys: any, info: any) => {
-    const selectedKeys = Array.isArray(checkedKeys) ? checkedKeys : checkedKeys.checked;
-    setSelectedFiles(selectedKeys);
+  const handleFileSelect = (checkedKeys: any) => {
+    setSelectedFiles(checkedKeys as string[]);
   };
 
   // 开始导入
@@ -208,28 +192,33 @@ const CloudImport: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/cloud-import/import', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          provider: selectedProvider,
-          files: selectedFiles,
-          accessToken
-        })
-      });
+      const response = await importCloudFiles(selectedProvider, selectedFiles, accessToken);
       
-      const data = await response.json();
-      if (data.code === 200) {
-        setImportTask({ id: data.data.taskId });
+      if (response.code === 200) {
+        setImportTask({ 
+          id: response.data.taskId, 
+          status: CloudTaskStatus.INITIALIZING 
+        });
         messageApi.success('导入任务已创建');
         
         // 监听导入进度
-        monitorImportTask(data.data.taskId);
+        monitorImportTask(response.data.taskId);
       } else {
-        messageApi.error('创建导入任务失败');
+        messageApi.error(`创建导入任务失败: ${response.message || '未知错误'}`);
       }
-    } catch (error) {
-      messageApi.error('导入失败');
+    } catch (error: unknown) {
+      console.error('Import failed:', error);
+      if (error instanceof Error) {
+        if ((error as any).code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+          messageApi.error('请求超时，请检查网络连接后重试');
+        } else if ((error as any).response) {
+          messageApi.error(`服务器错误: ${(error as any).response.status} ${(error as any).response.statusText}`);
+        } else {
+          messageApi.error('导入失败，请检查网络连接后重试');
+        }
+      } else {
+        messageApi.error('导入失败，请检查网络连接后重试');
+      }
     } finally {
       setLoading(false);
     }
@@ -237,59 +226,87 @@ const CloudImport: React.FC = () => {
 
   // 监听导入任务
   const monitorImportTask = async (taskId: string) => {
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      messageApi.error('导入任务超时，请稍后查看导入结果');
+      setImportTask(null);
+    }, 5 * 60 * 1000); // 5分钟超时
+
     const interval = setInterval(async () => {
       try {
-        const response = await fetch(`http://localhost:3001/cloud-import/task/${taskId}`);
-        const data = await response.json();
+        const response = await getImportTaskStatus(taskId);
         
-        if (data.code === 200) {
-          setImportTask(data.data);
+        if (response.code === 200) {
+          setImportTask(response.data);
           
-          if (data.data.status === 'SUCCESS') {
+          if (response.data.status === 'SUCCESS') {
+            clearTimeout(timeout);
             clearInterval(interval);
             messageApi.success('导入完成');
             setTimeout(() => {
               setIsModalOpen(false);
               resetModal();
             }, 2000);
-          } else if (data.data.status === 'FAILED') {
+          } else if (response.data.status === 'FAILED') {
+            clearTimeout(timeout);
             clearInterval(interval);
-            messageApi.error(`导入失败: ${data.data.message}`);
+            messageApi.error(`导入失败: ${response.data.message}`);
           }
         }
       } catch (error) {
+        clearTimeout(timeout);
+        clearInterval(interval);
         console.error('Failed to check task status:', error);
+        messageApi.error('检查导入状态失败，请稍后手动查看导入结果');
       }
     }, 2000);
+  };
+
+  // 处理极空间配置
+  const handleJspaceConfig = async () => {
+    if (!jspaceConfig.url || !jspaceConfig.username || !jspaceConfig.password) {
+      messageApi.error('请填写完整的极空间配置信息');
+      return;
+    }
+
+    try {
+      const response = await configureJSpace(jspaceConfig);
+      if (response.code === 200) {
+        messageApi.success('极空间配置成功');
+        setJspaceModalVisible(false);
+        setAccessToken('jspace-configured'); // 设置特殊的 token 标识
+        
+        // 自动获取极空间文件列表
+        await fetchFiles('jspace', 'jspace-configured');
+      } else {
+        messageApi.error('极空间配置失败');
+      }
+    } catch {
+      messageApi.error('极空间配置失败');
+    }
   };
 
   // 重置模态框状态
   const resetModal = () => {
     setSelectedProvider('');
-    setAccessToken('');
     setFiles([]);
     setSelectedFiles([]);
+    setAccessToken('');
     setImportTask(null);
   };
 
   // 格式化文件大小
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
+
 
   // 获取状态图标
-  const getStatusIcon = (status?: string) => {
+  const getStatusIcon = (status: CloudTaskStatus) => {
     switch (status) {
-      case 'INITIALIZING':
-      case 'PARSING':
+      case CloudTaskStatus.INITIALIZING:
+      case CloudTaskStatus.PARSING:
         return <LoadingOutlined spin />;
-      case 'SUCCESS':
+      case CloudTaskStatus.SUCCESS:
         return <CheckCircleOutlined style={{ color: '#52c41a' }} />;
-      case 'FAILED':
+      case CloudTaskStatus.FAILED:
         return <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />;
       default:
         return null;
@@ -300,7 +317,7 @@ const CloudImport: React.FC = () => {
     if (isModalOpen) {
       fetchProviders();
     }
-  }, [isModalOpen]);
+  }, [isModalOpen, fetchProviders]);
 
   const treeData = convertToTreeData(files);
 
@@ -350,13 +367,25 @@ const CloudImport: React.FC = () => {
             </Select>
             
             {selectedProvider && !accessToken && (
-              <Button
-                type="primary"
-                icon={<LinkOutlined />}
-                onClick={() => handleAuth(selectedProvider)}
-              >
-                连接网盘
-              </Button>
+              <>
+                {selectedProvider === 'jspace' ? (
+                  <Button
+                    type="primary"
+                    icon={<SettingOutlined />}
+                    onClick={() => setJspaceModalVisible(true)}
+                  >
+                    配置极空间
+                  </Button>
+                ) : (
+                  <Button
+                    type="primary"
+                    icon={<LinkOutlined />}
+                    onClick={() => handleAuth(selectedProvider)}
+                  >
+                    连接网盘
+                  </Button>
+                )}
+              </>
             )}
             
             {accessToken && (
@@ -375,6 +404,74 @@ const CloudImport: React.FC = () => {
             <div className={styles.step}>
               <Title level={4}>2. 选择音乐文件</Title>
               
+              {/* 目录和深度控制 - 仅对极空间显示 */}
+              {selectedProvider === 'jspace' && (
+                <Card size="small" style={{ marginBottom: 16 }}>
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    <div>
+                      <Text strong>扫描目录：</Text>
+                      <Radio.Group 
+                        value={pathInputMode} 
+                        onChange={(e) => setPathInputMode(e.target.value)}
+                        style={{ marginLeft: 8 }}
+                      >
+                        <Radio value="preset">预设目录</Radio>
+                        <Radio value="custom">自定义目录</Radio>
+                      </Radio.Group>
+                    </div>
+                    
+                    {pathInputMode === 'preset' ? (
+                      <div>
+                        <Select
+                          value={selectedPath}
+                          onChange={setSelectedPath}
+                          style={{ width: '100%' }}
+                          placeholder="选择目录"
+                        >
+                          <Option value="/">根目录</Option>
+                          <Option value="/music">音乐目录</Option>
+                          <Option value="/downloads">下载目录</Option>
+                          <Option value="/documents">文档目录</Option>
+                          <Option value="/videos">视频目录</Option>
+                        </Select>
+                      </div>
+                    ) : (
+                      <div>
+                        <Input
+                          value={customPath}
+                          onChange={(e) => setCustomPath(e.target.value)}
+                          placeholder="输入自定义路径，如 /my/music"
+                          addonBefore="/"
+                        />
+                      </div>
+                    )}
+                    
+                    <div>
+                      <Text strong>扫描深度：</Text>
+                      <InputNumber
+                        min={0}
+                        max={5}
+                        value={maxDepth}
+                        onChange={(value) => setMaxDepth(value || 0)}
+                        style={{ width: 80, marginLeft: 8 }}
+                      />
+                      <Text type="secondary" style={{ marginLeft: 8 }}>
+                        (0=当前目录，1=一层子目录，以此类推)
+                      </Text>
+                    </div>
+                    
+                    <Button 
+                      type="primary" 
+                      size="small" 
+                      onClick={() => fetchFiles(selectedProvider)}
+                      loading={loadingFiles}
+                    >
+                      重新扫描
+                    </Button>
+                  </Space>
+                </Card>
+              )}
+              
               {loadingFiles ? (
                 <div style={{ textAlign: 'center', padding: 20 }}>
                   <Spin size="large" />
@@ -391,7 +488,7 @@ const CloudImport: React.FC = () => {
                       onCheck={handleFileSelect}
                       treeData={treeData}
                       expandedKeys={expandedKeys}
-                      onExpand={setExpandedKeys}
+                      onExpand={(expandedKeys: any[]) => setExpandedKeys(expandedKeys as string[])}
                     />
                   </Card>
                 </>
@@ -409,17 +506,17 @@ const CloudImport: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   {getStatusIcon(importTask.status)}
                   <Text>
-                    {importTask.status === 'INITIALIZING' && '初始化中...'}
-                    {importTask.status === 'PARSING' && '下载和导入中...'}
-                    {importTask.status === 'SUCCESS' && '导入完成'}
-                    {importTask.status === 'FAILED' && '导入失败'}
-                  </Text>
+                  {importTask.status === CloudTaskStatus.INITIALIZING && '初始化中...'}
+                  {importTask.status === CloudTaskStatus.PARSING && '下载和导入中...'}
+                  {importTask.status === CloudTaskStatus.SUCCESS && '导入完成'}
+                  {importTask.status === CloudTaskStatus.FAILED && '导入失败'}
+                </Text>
                 </div>
                 
                 {importTask.total && importTask.current && (
                   <Progress
                     percent={Math.round((importTask.current / importTask.total) * 100)}
-                    status={importTask.status === 'FAILED' ? 'exception' : 'active'}
+                    status={importTask.status === CloudTaskStatus.FAILED ? 'exception' : 'active'}
                   />
                 )}
                 
@@ -452,6 +549,46 @@ const CloudImport: React.FC = () => {
             </div>
           )}
         </div>
+      </Modal>
+
+      {/* 极空间配置模态框 */}
+      <Modal
+        title="配置极空间"
+        open={jspaceModalVisible}
+        onOk={handleJspaceConfig}
+        onCancel={() => setJspaceModalVisible(false)}
+        okText="保存配置"
+        cancelText="取消"
+      >
+        <Space direction="vertical" style={{ width: '100%' }}>
+          <div>
+            <Text strong>极空间地址：</Text>
+            <Input
+              placeholder="http://your-jspace-ip:port"
+              value={jspaceConfig.url}
+              onChange={(e) => setJspaceConfig({ ...jspaceConfig, url: e.target.value })}
+              style={{ marginTop: 8 }}
+            />
+          </div>
+          <div>
+            <Text strong>用户名：</Text>
+            <Input
+              placeholder="请输入用户名"
+              value={jspaceConfig.username}
+              onChange={(e) => setJspaceConfig({ ...jspaceConfig, username: e.target.value })}
+              style={{ marginTop: 8 }}
+            />
+          </div>
+          <div>
+            <Text strong>密码：</Text>
+            <Input.Password
+              placeholder="请输入密码"
+              value={jspaceConfig.password}
+              onChange={(e) => setJspaceConfig({ ...jspaceConfig, password: e.target.value })}
+              style={{ marginTop: 8 }}
+            />
+          </div>
+        </Space>
       </Modal>
     </>
   );

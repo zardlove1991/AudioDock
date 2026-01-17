@@ -9,9 +9,9 @@ export class ArtistService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
 
@@ -112,16 +112,14 @@ export class ArtistService {
   async searchArtists(
     keyword: string,
     type?: TrackType,
-    limit: number = 10
+    limit: number = 10,
   ): Promise<Artist[]> {
     const candidates = await this.prisma.artist.findMany({
       where: {
         AND: [
           type ? { type } : {},
           {
-            OR: [
-              { name: { contains: keyword } },
-            ],
+            OR: [{ name: { contains: keyword } }],
           },
         ],
       },
@@ -151,7 +149,10 @@ export class ArtistService {
   }
 
   // 获取最近的艺术家
-  async getLatestArtists(limit: number = 8, type: TrackType): Promise<Artist[]> {
+  async getLatestArtists(
+    limit: number = 8,
+    type: TrackType,
+  ): Promise<Artist[]> {
     return await this.prisma.artist.findMany({
       take: limit,
       where: {
@@ -162,7 +163,10 @@ export class ArtistService {
   }
 
   // 获取随机艺术家
-  async getRandomArtists(limit: number = 8, type: TrackType): Promise<Artist[]> {
+  async getRandomArtists(
+    limit: number = 8,
+    type: TrackType,
+  ): Promise<Artist[]> {
     const count = await this.prisma.artist.count({
       where: { type },
     });
@@ -175,4 +179,3 @@ export class ArtistService {
     return artists.sort(() => Math.random() - 0.5);
   }
 }
-

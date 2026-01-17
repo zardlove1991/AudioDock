@@ -9,9 +9,9 @@ export class UserTrackLikeService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
 
@@ -44,11 +44,16 @@ export class UserTrackLikeService {
     });
   }
 
-  async loadMoreUserTrackLike(loadCount: number, pageSize: number, userId: number, type?: string) {
+  async loadMoreUserTrackLike(
+    loadCount: number,
+    pageSize: number,
+    userId: number,
+    type?: string,
+  ) {
     return await this.prisma.userTrackLike.findMany({
       skip: loadCount * pageSize,
       take: pageSize,
-      where: { 
+      where: {
         userId,
         track: type ? { type: type as any } : undefined,
       },
@@ -62,7 +67,7 @@ export class UserTrackLikeService {
             artistEntity: true,
             albumEntity: true,
             likedByUsers: true,
-          }
+          },
         },
       },
     });
@@ -81,4 +86,3 @@ export class UserTrackLikeService {
     });
   }
 }
-

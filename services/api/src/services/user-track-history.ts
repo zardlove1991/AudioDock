@@ -9,9 +9,9 @@ export class UserTrackHistoryService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
 
@@ -23,7 +23,8 @@ export class UserTrackHistoryService {
     });
 
     if (lastHistory && lastHistory.trackId === data.trackId) {
-      const diff = new Date().getTime() - new Date(lastHistory.listenedAt).getTime();
+      const diff =
+        new Date().getTime() - new Date(lastHistory.listenedAt).getTime();
       // If less than 1 hour, update the existing record (progress, device, time)
       if (diff < 60 * 60 * 1000) {
         return await this.prisma.userTrackHistory.update({
@@ -36,7 +37,9 @@ export class UserTrackHistoryService {
       }
     }
 
-    return await this.prisma.userTrackHistory.create({ data: { ...data, listenedAt: new Date() } });
+    return await this.prisma.userTrackHistory.create({
+      data: { ...data, listenedAt: new Date() },
+    });
   }
 
   async findAll() {
@@ -62,11 +65,16 @@ export class UserTrackHistoryService {
     });
   }
 
-  async loadMoreUserTrackHistory(pageSize: number, loadCount: number, userId: number, type?: string) {
+  async loadMoreUserTrackHistory(
+    pageSize: number,
+    loadCount: number,
+    userId: number,
+    type?: string,
+  ) {
     return await this.prisma.userTrackHistory.findMany({
       skip: loadCount * pageSize,
       take: pageSize,
-      where: { 
+      where: {
         userId,
         track: type ? { type: type as any } : undefined,
       },
@@ -76,7 +84,7 @@ export class UserTrackHistoryService {
             artistEntity: true,
             albumEntity: true,
             likedByUsers: true,
-          }
+          },
         },
       },
       distinct: ['trackId'],
@@ -94,16 +102,15 @@ export class UserTrackHistoryService {
     return await this.prisma.userTrackHistory.findFirst({
       where: { userId },
       orderBy: { listenedAt: 'desc' },
-      include: { 
+      include: {
         track: {
           include: {
             artistEntity: true,
             albumEntity: true,
             likedByUsers: true,
-          }
-        } 
+          },
+        },
       },
     });
   }
 }
-

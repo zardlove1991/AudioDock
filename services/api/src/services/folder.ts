@@ -11,9 +11,9 @@ export class FolderService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
 
@@ -153,4 +153,3 @@ export class FolderService {
     }
   }
 }
-

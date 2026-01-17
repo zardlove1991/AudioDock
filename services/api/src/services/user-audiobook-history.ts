@@ -9,9 +9,9 @@ export class UserAudiobookHistoryService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
 
@@ -20,7 +20,7 @@ export class UserAudiobookHistoryService {
       where: {
         userId: data.userId,
         trackId: data.trackId,
-      }
+      },
     });
 
     if (existing) {
@@ -29,7 +29,7 @@ export class UserAudiobookHistoryService {
         data: {
           progress: data.progress,
           listenedAt: new Date(),
-        }
+        },
       });
     }
 
@@ -72,4 +72,3 @@ export class UserAudiobookHistoryService {
     return await this.prisma.userAudiobookHistory.count();
   }
 }
-

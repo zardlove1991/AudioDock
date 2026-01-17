@@ -9,9 +9,9 @@ export class PlaylistService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
 
@@ -52,7 +52,7 @@ export class PlaylistService {
             artistEntity: true,
             albumEntity: true,
             likedByUsers: true,
-          }
+          },
         },
       },
     });
@@ -104,4 +104,3 @@ export class PlaylistService {
     });
   }
 }
-

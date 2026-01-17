@@ -9,9 +9,9 @@ export class UserAlbumHistoryService {
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: process.env.DATABASE_URL || "file:./dev.db"
-        }
-      }
+          url: process.env.DATABASE_URL || 'file:./dev.db',
+        },
+      },
     });
   }
 
@@ -44,9 +44,14 @@ export class UserAlbumHistoryService {
     });
   }
 
-  async loadMoreUserAlbumHistory(pageSize: number, loadCount: number, userId: number, type?: string) {
+  async loadMoreUserAlbumHistory(
+    pageSize: number,
+    loadCount: number,
+    userId: number,
+    type?: string,
+  ) {
     const list = await this.prisma.userAlbumHistory.findMany({
-      where: { 
+      where: {
         userId,
         album: type ? { type: type as any } : undefined,
       },
@@ -67,7 +72,6 @@ export class UserAlbumHistoryService {
     return list;
   }
 
-
   async userAlbumHistoryCount(userId?: number) {
     if (userId) {
       // Count unique albums for the user
@@ -80,4 +84,3 @@ export class UserAlbumHistoryService {
     return await this.prisma.userAlbumHistory.count();
   }
 }
-

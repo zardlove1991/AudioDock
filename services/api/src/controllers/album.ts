@@ -1,23 +1,23 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Logger,
-    Param,
-    Post,
-    Put,
-    Query,
-    Req,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Logger,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
 } from '@nestjs/common';
 import { Public } from '../common/public.decorator';
 import { Album, TrackType } from '@soundx/db';
 import { Request } from 'express';
 import {
-    IErrorResponse,
-    ILoadMoreData,
-    ISuccessResponse,
-    ITableData,
+  IErrorResponse,
+  ILoadMoreData,
+  ISuccessResponse,
+  ITableData,
 } from 'src/common/const';
 import { LogMethod } from '../common/log-method.decorator';
 import { AlbumService } from '../services/album';
@@ -29,7 +29,7 @@ export class AlbumController {
   constructor(
     private readonly albumService: AlbumService,
     private readonly trackService: TrackService,
-  ) { }
+  ) {}
 
   @Public()
   @Get('/album/list')
@@ -50,16 +50,14 @@ export class AlbumController {
     }
   }
 
-
-
-
   @Get('/album/collaborative/:artist')
   @LogMethod()
   async getCollaborativeAlbumsByArtist(
     @Param('artist') artist: string,
   ): Promise<ISuccessResponse<Album[]> | IErrorResponse> {
     try {
-      const albumList = await this.albumService.getCollaborativeAlbumsByArtist(artist);
+      const albumList =
+        await this.albumService.getCollaborativeAlbumsByArtist(artist);
       return {
         code: 200,
         message: 'success',
@@ -276,7 +274,6 @@ export class AlbumController {
     }
   }
 
-
   // 新增：最近 8 个专辑
   @Get('/album/latest')
   @LogMethod()
@@ -290,7 +287,7 @@ export class AlbumController {
       const userId = (req.user as any)?.userId;
       const isRandom = random === 'true';
       const limit = pageSize ? parseInt(pageSize, 10) : 8;
-      const list = isRandom 
+      const list = isRandom
         ? await this.albumService.getRandomAlbums(limit, type, Number(userId))
         : await this.albumService.getLatestAlbums(limit, type, Number(userId));
       return { code: 200, message: 'success', data: list };
@@ -335,7 +332,12 @@ export class AlbumController {
     try {
       const userId = (req.user as any)?.userId;
       const limitNum = limit ? parseInt(limit, 10) : 10;
-      const albums = await this.albumService.searchAlbums(keyword, type, limitNum, Number(userId));
+      const albums = await this.albumService.searchAlbums(
+        keyword,
+        type,
+        limitNum,
+        Number(userId),
+      );
       return {
         code: 200,
         message: 'success',
@@ -361,7 +363,10 @@ export class AlbumController {
       if (isNaN(Number(id))) {
         return { code: 500, message: 'Invalid ID' };
       }
-      const album = await this.albumService.getAlbumById(parseInt(id), userId ? parseInt(userId) : undefined);
+      const album = await this.albumService.getAlbumById(
+        parseInt(id),
+        userId ? parseInt(userId) : undefined,
+      );
       if (!album) {
         return { code: 500, message: 'Album not found' };
       }
@@ -404,7 +409,7 @@ export class AlbumController {
         Number(skip) || 0,
         sort,
         keyword,
-        Number(userId)
+        Number(userId),
       );
       const total = await this.trackService.getTrackCountByAlbum(
         album.name,

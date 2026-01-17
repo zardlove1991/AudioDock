@@ -7,7 +7,7 @@ import {
   Param,
   Post,
   Put,
-  Query
+  Query,
 } from '@nestjs/common';
 import { Artist, TrackType } from '@soundx/db';
 import {
@@ -24,7 +24,7 @@ import { ArtistService } from '../services/artist';
 @Controller()
 export class ArtistController {
   private readonly logger = new Logger(ArtistController.name);
-  constructor(private readonly artistService: ArtistService) { }
+  constructor(private readonly artistService: ArtistService) {}
 
   @Get('/artist/list')
   @LogMethod()
@@ -237,7 +237,11 @@ export class ArtistController {
   ): Promise<ISuccessResponse<Artist[]> | IErrorResponse> {
     try {
       const limitNum = limit ? parseInt(limit, 10) : 10;
-      const artists = await this.artistService.searchArtists(keyword, type, limitNum);
+      const artists = await this.artistService.searchArtists(
+        keyword,
+        type,
+        limitNum,
+      );
       return {
         code: 200,
         message: 'success',
@@ -260,7 +264,11 @@ export class ArtistController {
     @Query('random') random?: string,
   ): Promise<ISuccessResponse<Artist[]> | IErrorResponse> {
     try {
-      const limitNum = pageSize ? parseInt(pageSize, 10) : (limit ? parseInt(limit, 10) : 10);
+      const limitNum = pageSize
+        ? parseInt(pageSize, 10)
+        : limit
+          ? parseInt(limit, 10)
+          : 10;
       const isRandom = random === 'true';
       const artists = isRandom
         ? await this.artistService.getRandomArtists(limitNum, type)
@@ -277,7 +285,6 @@ export class ArtistController {
       };
     }
   }
-
 
   @Get('/artist/:id')
   @LogMethod()
